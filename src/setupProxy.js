@@ -18,6 +18,14 @@ module.exports = function (app) {
     );
 
     app.use(
+        '/proxy',
+        proxy({
+            target: 'http://localhost:3080',
+            changeOrigin: true
+        })
+    );
+
+    /*app.use(
         '/mobile_store_proxy',
         proxy({
             target: 'http://localhost:3080',
@@ -31,5 +39,5 @@ module.exports = function (app) {
             target: 'http://localhost:3080',
             changeOrigin: true
         })
-    );
+    );*/
 };

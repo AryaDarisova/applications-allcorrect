@@ -30,14 +30,14 @@ export default function ProjectBibleTemplateHeader(props) {
     const [showAlert, setShowAlert] = useState(true)
 
     async function addColumnToTheEnd(type) {
-        await fetch("/project_bible_template/projectBibleTemplateGenerateIndividualCode", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateIndividualCode", {
             method: 'GET',
         })
             .then(res => res.json())
             .then(
                 async (resultGenerate) => {
                     if (!resultGenerate.exist.length) {
-                        await fetch("/project_bible_template/projectBibleTemplateAddColumnToTheEnd", {
+                        await fetch("/proxy/project_bible_template/projectBibleTemplateAddColumnToTheEnd", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -100,14 +100,14 @@ export default function ProjectBibleTemplateHeader(props) {
     }
 
     async function addColumn(type, num) {
-        await fetch("/project_bible_template/projectBibleTemplateGenerateIndividualCode", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateIndividualCode", {
             method: 'GET',
         })
             .then(res => res.json())
             .then(
                 async (resultGenerate) => {
                     if (!resultGenerate.exist.length) {
-                        await fetch("/project_bible_template/projectBibleTemplateIncNumPredAddColumn", {
+                        await fetch("/proxy/project_bible_template/projectBibleTemplateIncNumPredAddColumn", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -120,7 +120,7 @@ export default function ProjectBibleTemplateHeader(props) {
                             .then(res => res.json())
                             .then(
                                 async (resultPredAdd) => {
-                                    await fetch("/project_bible_template/projectBibleTemplateAddColumn", {
+                                    await fetch("/proxy/project_bible_template/projectBibleTemplateAddColumn", {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ export default function ProjectBibleTemplateHeader(props) {
     }
 
     async function updateColumnTemplate(column, code, value) {
-        await fetch("/project_bible_template/projectBibleTemplateUpdateColumnTemplate", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateUpdateColumnTemplate", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -213,7 +213,7 @@ export default function ProjectBibleTemplateHeader(props) {
     }
 
     async function deleteColumn(type, code, num) {
-        await fetch("/project_bible_template/projectBibleTemplateDecNumPredDeleteColumn", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateDecNumPredDeleteColumn", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -226,7 +226,7 @@ export default function ProjectBibleTemplateHeader(props) {
             .then(res => res.json())
             .then(
                 async (resultPredDelete) => {
-                    await fetch("/project_bible_template/projectBibleTemplateDeleteColumn", {
+                    await fetch("/proxy/project_bible_template/projectBibleTemplateDeleteColumn", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -269,7 +269,7 @@ export default function ProjectBibleTemplateHeader(props) {
 
     async function moveUpColumn(type, code, num) {
         if (num !== 1) {
-            await fetch("/project_bible_template/projectBibleTemplateMoveUpColumn", {
+            await fetch("/proxy/project_bible_template/projectBibleTemplateMoveUpColumn", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -318,7 +318,7 @@ export default function ProjectBibleTemplateHeader(props) {
         let columnLength = type === "main" ? columnsActive[0].data.length : columnsForClient[0].data.length
 
         if (num !== columnLength) {
-            await fetch("/project_bible_template/projectBibleTemplateMoveDownColumn", {
+            await fetch("/proxy/project_bible_template/projectBibleTemplateMoveDownColumn", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -364,7 +364,7 @@ export default function ProjectBibleTemplateHeader(props) {
     }
 
     useEffect(async () => {
-        await fetch("/project_bible_template/projectBibleTemplate", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplate", {
             method: 'GET',
         })
             .then(res => res.json())

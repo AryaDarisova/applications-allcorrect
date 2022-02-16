@@ -15,9 +15,9 @@ export default function TableCell(props) {
     const projectCode = queryStringParams.project_code
 
     async function oninputCell(column, row, type, e) {
-        let queryLinkExist = '/project_bible_template/'
-        let queryUpdateCell = '/project_bible_template/'
-        let queryInsertCell = '/project_bible_template/'
+        let queryLinkExist = '/proxy/project_bible_template/'
+        let queryUpdateCell = '/proxy/project_bible_template/'
+        let queryInsertCell = '/proxy/project_bible_template/'
         let value
 
         if (type === "input") {

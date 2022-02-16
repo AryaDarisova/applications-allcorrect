@@ -10,7 +10,7 @@ export default function ProjectBibleTemplateHeader(props) {
     }]);
 
     useEffect(async () => {
-        await fetch("/project_bible_template/projectBibleTemplate", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplate", {
             method: 'GET',
         })
             .then(res => res.json())

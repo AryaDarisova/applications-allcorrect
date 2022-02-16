@@ -16,9 +16,9 @@ app.get('/', (req, res) => {
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../my-app/build')));
 
-app.use('/project_bible_template', projectBibleTemplateRouter)
+app.use('/proxy/project_bible_template', projectBibleTemplateRouter)
 
-app.post('/mobile_store_proxy/google_play', (req, res) => {
+app.post('/proxy/mobile_store_proxy/google_play', (req, res) => {
     googlePlayReviews.reviews({
         appId: req.body.appId,
         lang: req.body.lang,
@@ -38,7 +38,7 @@ app.post('/mobile_store_proxy/google_play', (req, res) => {
         );
 });
 
-app.post('/mobile_store_proxy/app_store', (req, res) => {
+app.post('/proxy/mobile_store_proxy/app_store', (req, res) => {
     appStoreReviews.ratings({
         id: req.body.appId,
         country: req.body.countryCodes

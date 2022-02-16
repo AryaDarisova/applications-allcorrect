@@ -25,7 +25,7 @@ export default function ProjectBibleTemplateHeader(props) {
 
     useEffect(async () => {
         //проверяем создавали ли ранее этот отчет
-        await fetch("/project_bible_template/projectBibleInfo", {
+        await fetch("/proxy/project_bible_template/projectBibleInfo", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ export default function ProjectBibleTemplateHeader(props) {
                     } else {
                         console.log("empty data", result)
                         //todo
-                        await fetch("/project_bible_template/projectBibleTemplateRowsColumns", {
+                        await fetch("/proxy/project_bible_template/projectBibleTemplateRowsColumns", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ export default function ProjectBibleTemplateHeader(props) {
                                 async (resultTemplate) => {
                                     // console.log("projectBibleTemplateRowsColumns result", resultTemplate.columns, resultTemplate.rows)
 
-                                    await fetch("/project_bible_template/projectBibleInfoInsert", {
+                                    await fetch("/proxy/project_bible_template/projectBibleInfoInsert", {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json'
@@ -178,8 +178,8 @@ export default function ProjectBibleTemplateHeader(props) {
             rowsData.data.map(async row => {
                 columns.map(columnsData => {
                     columnsData.data.map(async column => {
-                        let queryLinkTemplate = '/project_bible_template/'
-                        let queryLinkEditable = '/project_bible_template/'
+                        let queryLinkTemplate = '/proxy/project_bible_template/'
+                        let queryLinkEditable = '/proxy/project_bible_template/'
 
                         if (column.type === "input") {
                             queryLinkTemplate += 'projectBibleTemplateTextByName'

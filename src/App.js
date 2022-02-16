@@ -261,7 +261,7 @@ function App() {
   }
 
   async function googlePlayRekursivelyGetReviews(nextPaginationToken, appId, lang, langLength, langName, langCodesLength) {
-    const response = await fetch('/mobile_store_proxy/google_play', {
+    const response = await fetch('/proxy/mobile_store_proxy/google_play', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({nextPaginationToken: nextPaginationToken, appId: appId, lang: lang})
@@ -311,7 +311,7 @@ function App() {
   }
 
   async function appStoreRekursivelyGetReviews(appId, countryCodes, countryName, infoReadyBool) {
-    const response = await fetch('/mobile_store_proxy/app_store', {
+    const response = await fetch('/proxy/mobile_store_proxy/app_store', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({appId: appId, countryCodes: countryCodes})
