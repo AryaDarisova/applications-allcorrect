@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const app = express()
 const bodyParser = require("body-parser");
-const PORT = process.env.PORT || 3080;
+const PORT = /*process.env.PORT || */3080;
 const projectBibleTemplateRouter = require('./routes/projectBibleTemplate.routes')
 
 let googlePlayReviews = require('google-play-scraper');
