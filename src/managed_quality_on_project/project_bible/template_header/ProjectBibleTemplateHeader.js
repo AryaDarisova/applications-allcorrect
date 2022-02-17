@@ -180,7 +180,7 @@ export default function ProjectBibleTemplateHeader(props) {
                                 }
                             )
                     } else {
-                        addColumnToTheEnd(type)
+                        addColumn(type, num)
                     }
                 },
                 (error) => {
@@ -309,8 +309,6 @@ export default function ProjectBibleTemplateHeader(props) {
                         //todo придумать какой-то текст ошибки
                     }
                 )
-        } else {
-            console.log("нельзя поднять выше первую строчку")
         }
     }
 
@@ -331,7 +329,7 @@ export default function ProjectBibleTemplateHeader(props) {
             })
                 .then(res => res.json())
                 .then(
-                    (resultMoveUp) => {
+                    (resultMoveDown) => {
                         let value = type === "main" ? columnsActive[0].data[num - 1] : columnsForClient[0].data[num - 1]
 
                         if (type === "main") {
@@ -358,8 +356,6 @@ export default function ProjectBibleTemplateHeader(props) {
                         //todo придумать какой-то текст ошибки
                     }
                 )
-        } else {
-            console.log("нельзя опустить ниже последнюю строчку")
         }
     }
 
@@ -544,113 +540,5 @@ export default function ProjectBibleTemplateHeader(props) {
                 </div>
             </div>
         )
-        /*return(
-            <div>
-                {
-                    showAlert &&
-                    <div style={styles.alertMargin}>
-                        <br />
-                        <Alert variant="primary" onClose={() => setShowAlert(false)} dismissible>
-                            <Alert.Heading>Памятка по редактированию столбцов:</Alert.Heading>
-                            <span>
-                                Каждая колонка имеет свой индивидуальный код, в связи с этим во избежание
-                                возможных конфликтов:
-                                <br />
-                                <br />
-                                1. Если вы хотите кардинально изменить существующую колонку, лучше удалите ее и
-                                с нуля добавьте новую.
-                                <br />
-                                К кардинальным изменениям можно относить:
-                                <br />
-                                - изменение типа хранимых данных в колонке (Поле ввода, Чек-бокс, Список тегов);
-                                <br />
-                                2. Изменить название колонки можно в любой момент, это изменение не считается
-                                кардинальным.
-                                <br />
-                                3. Перемещение колонок (кнопки: <Button size="sm" variant="primary" style={styles.smallBtn}><FontAwesomeIcon icon={faChevronUp} /></Button>&nbsp;
-                                <Button size="sm" variant="primary" style={styles.smallBtn}><FontAwesomeIcon
-                                    icon={faChevronDown} /></Button>) меняет порядок следования колонок.
-                                <br />
-                                4. Добавление строки (кнопка: <Button size="sm" variant="success" style={styles.smallBtn}><FontAwesomeIcon icon={faPlus} /></Button>) добавит ее
-                                после строки, в которой была нажата кнопка.
-                                <br />
-                                5. Удаление колонки (кнопка: <Button size="sm" variant="danger" style={styles.smallBtn}><FontAwesomeIcon icon={faTimes}/></Button>) не удаляет
-                                ее из базы данных, а делает ее неактивной - так "удаленные" колонки могут
-                                продолжать отображаться в отчетах, на момент заполнения которых эта колонка еще
-                                существовала.
-                                <br />
-                                А также для того, чтобы при создании новых колонок не возникло ситуации с
-                                повторяющимся кодом, который уже ранее генерировался для другой колонки.
-                                <br />
-                                6. Добавление строки (кнопка: <Button size="sm" variant="primary" style={styles.smallBtn}>Добавить&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} />
-                            </Button>) добавит ее в конец.
-                            </span>
-                        </Alert>
-                    </div>
-                }
-                <br />
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="managedQualityOnProjectBlockView">
-                            <div className="center">
-                                <h4>Колонки для отчета и их основные характеристики:</h4>
-                            </div>
-                            <br />
-                            <Table responsive bordered>
-                                <thead>
-                                <tr>
-                                    <th className="center">Название колонки</th>
-                                    <th className="center">Тип поля</th>
-                                    <th className="center">Редактируемое поле?</th>
-                                    <th className="center">Есть ли шаблон?</th>
-                                    <th className="center">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {
-                                    /!*columnsActive.map(column => (
-                                        <ColumnsActiveInfo key={column.code} column={column}></ColumnsActiveInfo>
-                                    ))*!/
-                                }
-                                </tbody>
-                            </Table>
-                            <div className="center">
-                                <Button variant="primary">Добавить&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} /></Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <br />
-                <div className="row">
-                    <div className="col-sm6">
-                        <div className="managedQualityOnProjectBlockView">
-                            <div className="center">
-                                <h4>Колонки для заполнения клиентом и их характеристики:</h4>
-                            </div>
-                            <br />
-                            <Table responsive bordered>
-                                <thead>
-                                <tr>
-                                    <th className="center">Название колонки</th>
-                                    <th className="center">Тип поля</th>
-                                    <th className="center">Действия</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {
-                                    /!*columnsForClient.map(column => (
-                                        <ColumnsForClientInfo key={column.code} column={column}></ColumnsForClientInfo>
-                                    ))*!/
-                                }
-                                </tbody>
-                            </Table>
-                            <div className="center">
-                                <Button variant="primary">Добавить&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} /></Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )*/
     }
 }

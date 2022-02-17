@@ -8,6 +8,7 @@ import ManagedQualityOnProjectView from "./managed_quality_on_project/view/Manag
 import ManagedQualityOnProjectCreate from "./managed_quality_on_project/create/ManagedQualityOnProjectCreate";
 import ProjectBibleTemplateHeader from "./managed_quality_on_project/project_bible/template_header/ProjectBibleTemplateHeader";
 import ProjectBibleTemplateBody from "./managed_quality_on_project/project_bible/template_body/ProjectBibleTemplateBody";
+import ProjectBibleTemplateTags from "./managed_quality_on_project/project_bible/template_tags/ProjectBibleTemplateTags";
 import ProjectBibleView from "./managed_quality_on_project/project_bible/view/ProjectBibleView";
 import logo from "./img/logo1.png";
 
@@ -435,6 +436,7 @@ function App() {
                 setSteamLanguageClearPercentOnInput={setSteamLanguageClearPercentOnInput} /> } />
             <Route path="/managed_quality_on_project/project_bible/template_header" element={<ProjectBibleTemplateHeader /> } />
             <Route path="/managed_quality_on_project/project_bible/template_body" element={<ProjectBibleTemplateBody /> } />
+            <Route path="/managed_quality_on_project/project_bible/template_tags" element={<ProjectBibleTemplateTags /> } />
             <Route path="/managed_quality_on_project/project_bible/view" element={<ProjectBibleView /> } />
 
 

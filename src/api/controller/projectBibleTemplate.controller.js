@@ -108,17 +108,89 @@ class ProjectBibleTemplateController {
 
     async setProjectBibleTemplateDeleteColumn(req, res) {
         const {code} = req.body
-        const queryDeleteColumn = await db.query(
+        /*const queryDeleteColumn = await db.query(
             'DELETE FROM project_bible_template WHERE code = $1',
+            [code]
+        )*/
+        const queryDeleteColumn = await db.query(
+            'UPDATE project_bible_template SET active = false WHERE code = $1',
             [code]
         )
 
         res.json(queryDeleteColumn)
     }
 
+    //Запросы к таблице project_bible_template_tags
+    async getProjectBibleTemplateTags(req, res) {
+        const tags = await db.query(
+            'SELECT * FROM project_bible_template_tags ORDER BY tag_group, value'
+        )
+
+        res.json({"tags": tags.rows})
+    }
+
+    async setProjectBibleTemplateTagsUpdateGroupTag(req, res) {
+        const {oldTitle, newTitle} = req.body
+        const queryUpdateGroupTag = await db.query(
+            'UPDATE project_bible_template_tags SET tag_group = $2 WHERE tag_group = $1',
+            [oldTitle, newTitle]
+        )
+
+        res.json(queryUpdateGroupTag)
+    }
+
+    async setProjectBibleTemplateTagsCheckExistBeforeUpdateTag(req, res) {
+        const {group, oldTitle} = req.body
+        const queryExist = await db.query(
+            'SELECT * FROM project_bible_template_tags WHERE tag_group = $1 AND value = $2',
+            [group, oldTitle]
+        )
+
+        res.json(queryExist.rows)
+    }
+
+    async setProjectBibleTemplateTagsAddTag(req, res) {
+        const {group, oldTitle, newTitle} = req.body
+        const queryAddTag = await db.query(
+            'INSERT INTO project_bible_template_tags (tag_group, value) VALUES ($1, $2)',
+            [group, newTitle]
+        )
+
+        res.json(queryAddTag)
+    }
+
+    async setProjectBibleTemplateTagsUpdateTag(req, res) {
+        const {group, oldTitle, newTitle} = req.body
+        const queryUpdateTag = await db.query(
+            'UPDATE project_bible_template_tags SET value = $3 WHERE tag_group = $1 AND value = $2',
+            [group, oldTitle, newTitle]
+        )
+
+        res.json(queryUpdateTag)
+    }
+
+    async setProjectBibleTemplateTagsDeleteGroupTag(req, res) {
+        const {group} = req.body
+        const queryDeleteGroupTag = await db.query(
+            'DELETE FROM project_bible_template_tags WHERE tag_group = $1',
+            [group]
+        )
+
+        res.json(queryDeleteGroupTag)
+    }
+
+    async setProjectBibleTemplateTagsDeleteTag(req, res) {
+        const {group, value} = req.body
+        const queryDeleteTag = await db.query(
+            'DELETE FROM project_bible_template_tags WHERE tag_group = $1 AND value = $2',
+            [group, value]
+        )
+
+        res.json(queryDeleteTag)
+    }
+
     //Запросы к таблице project_bible_template && project_bible_template_rows
     async getProjectBibleColumnsRowsTemplate(req, res) {
-        //todo тут для получения колонок надо поставить условие, что active = true & col_for_client = false
         const columns = await db.query(
             'SELECT code, name, type, editable, template FROM project_bible_template WHERE active = true AND col_for_client = false ORDER BY num'
         )
@@ -128,7 +200,116 @@ class ProjectBibleTemplateController {
         res.json({"columns": columns.rows, "rows": rows.rows})
     }
 
+    async getProjectBibleActiveColumnsWithTemplateAndRows(req, res) {
+        const columns = await db.query(
+            'SELECT code, name, type FROM project_bible_template WHERE active = true AND template = true AND col_for_client = false ORDER BY num'
+        )
+        const rows = await db.query(
+            'SELECT code FROM project_bible_template_rows WHERE active = true ORDER BY num')
+
+        res.json({"columns": columns.rows, "rows": rows.rows})
+    }
+
+    //Запросы к таблице project_bible_template_rows
+    async projectBibleTemplateGenerateRowIndividualCode(req, res) {
+        let abc = "abcdefghijklmnopqrstuvwxyz1234567890-";
+        let individualCode = "";
+
+        while (individualCode.length < 36) {
+            individualCode += abc[Math.floor(Math.random() * abc.length)];
+        }
+
+        const exist = await db.query('SELECT * FROM project_bible_template_rows WHERE code = $1', [individualCode])
+
+        res.json({"individualCode": individualCode, "exist": exist.rows})
+    }
+
+    async setProjectBibleTemplateAddRowToTheEnd(req, res) {
+        const {num, code, active} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_template_rows (num, code, active) VALUES ($1, $2, $3)',
+            [num, code, active]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleTemplateIncNumPredAddRow(req, res) {
+        const {initNum} = req.body
+        const queryIncFollowingNum = await db.query(
+            'UPDATE project_bible_template_rows SET num = num + 1 WHERE num > $1',
+            [initNum]
+        )
+
+        res.json(queryIncFollowingNum)
+    }
+
+    async setProjectBibleTemplateAddRow(req, res) {
+        const {num, code, active} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_template_rows (num, code, active) VALUES ($1, $2, $3)',
+            [num, code, active]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleTemplateDecNumPredDeleteRow(req, res) {
+        const {initNum} = req.body
+        const queryDecFollowingNum = await db.query(
+            'UPDATE project_bible_template_rows SET num = num - 1 WHERE num > $1',
+            [initNum]
+        )
+
+        res.json(queryDecFollowingNum)
+    }
+
+    async setProjectBibleTemplateDeleteRow(req, res) {
+        const {code} = req.body
+        /*const queryDeleteColumn = await db.query(
+            'DELETE FROM project_bible_template_rows WHERE code = $1',
+            [code]
+        )*/
+        const queryDeleteColumn = await db.query(
+            'UPDATE project_bible_template_rows SET active = false WHERE code = $1',
+            [code]
+        )
+
+        res.json(queryDeleteColumn)
+    }
+
+    async setProjectBibleTemplateMoveUpRow(req, res) {
+        const {code, num} = req.body
+        const previousRowNum = num - 1
+        const queryIncPreviousRow = await db.query(
+            'UPDATE project_bible_template_rows SET num = num + 1 WHERE num = $1',
+            [previousRowNum]
+        )
+        const queryDecCurrentRow = await db.query(
+            'UPDATE project_bible_template_rows SET num = num - 1 WHERE code = $1 AND num = $2',
+            [code, num]
+        )
+
+        res.json({"queryDecCurrentRow": queryDecCurrentRow, "queryIncPreviousRow": queryIncPreviousRow})
+    }
+
+    async setProjectBibleTemplateMoveDownRow(req, res) {
+        const {code, num} = req.body
+        const followingRowNum = num + 1
+        const queryDecFollowingRow = await db.query(
+            'UPDATE project_bible_template_rows SET num = num - 1 WHERE num = $1',
+            [followingRowNum]
+        )
+        const queryIncCurrentRow = await db.query(
+            'UPDATE project_bible_template_rows SET num = num + 1 WHERE code = $1 AND num = $2',
+            [code, num]
+        )
+
+        res.json({"queryIncCurrentRow": queryIncCurrentRow, "queryDecFollowingRow": queryDecFollowingRow})
+    }
+
     //Запросы к таблице project_bible_template_text
+    //todo даже во view не везде может быть значение template заполненное
     async getProjectBibleTextTemplateValue(req, res) {
         const {rowCode, colCode} = req.body
         const value = await db.query(
@@ -137,6 +318,36 @@ class ProjectBibleTemplateController {
         )
 
         res.json(value.rows[0].value)
+    }
+
+    async getProjectBibleTextTemplateIfExistValue(req, res) {
+        const {rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_template_text WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleTemplateOninputUpdateTextCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_template_text SET value = $3 WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleTemplateOninputInsertTextCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_template_text (row_code, col_code, value) VALUES ($1, $2, $3)',
+            [rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
     }
 
     //Запросы к таблице project_bible_template_bool
@@ -148,6 +359,36 @@ class ProjectBibleTemplateController {
         )
 
         res.json(value.rows[0].value)
+    }
+
+    async getProjectBibleBoolTemplateIfExistValue(req, res) {
+        const {rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_template_bool WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleTemplateOninputUpdateBoolCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_template_bool SET value = $3 WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleTemplateOninputInsertBoolCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_template_bool (row_code, col_code, value) VALUES ($1, $2, $3)',
+            [rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
     }
 
     //Запросы к таблице project_bible_info

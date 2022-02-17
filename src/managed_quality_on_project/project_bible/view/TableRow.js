@@ -1,4 +1,3 @@
-import {FormCheck, Table} from "react-bootstrap";
 import React from "react";
 import TableCell from "../view/TableCell";
 

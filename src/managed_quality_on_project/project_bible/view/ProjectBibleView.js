@@ -182,10 +182,12 @@ export default function ProjectBibleTemplateHeader(props) {
                         let queryLinkEditable = '/proxy/project_bible_template/'
 
                         if (column.type === "input") {
-                            queryLinkTemplate += 'projectBibleTemplateTextByName'
+                            // queryLinkTemplate += 'projectBibleTemplateTextByName'
+                            queryLinkTemplate += 'projectBibleTemplateTextByNameIfExist'
                             queryLinkEditable += 'projectBibleFilledCellTextByName'
                         } else if (column.type === "checkbox") {
-                            queryLinkTemplate += 'projectBibleTemplateBoolByName'
+                            // queryLinkTemplate += 'projectBibleTemplateBoolByName'
+                            queryLinkTemplate += 'projectBibleTemplateBoolByNameIfExist'
                             queryLinkEditable += 'projectBibleFilledCellBoolByName'
                         }
 
@@ -226,7 +228,15 @@ export default function ProjectBibleTemplateHeader(props) {
                                                         row.data[column.code] = resultEditable[0].value
                                                     } else {
                                                         // row.data.push(resultTemplate)
-                                                        row.data[column.code] = resultTemplate
+                                                        // row.data[column.code] = resultTemplate
+
+                                                        if (resultTemplate.length) {
+                                                            row.data[column.code] = resultTemplate[0].value
+                                                        } else if (column.type === "input") {
+                                                            row.data[column.code] = ""
+                                                        } else if (column.type === "checkbox") {
+                                                            row.data[column.code] = false
+                                                        }
                                                     }
 
                                                     cellOnCount++
@@ -264,7 +274,15 @@ export default function ProjectBibleTemplateHeader(props) {
                                         // console.log("columns[i].template", result)
 
                                         // row.data.push(result)
-                                        row.data[column.code] = result
+                                        // row.data[column.code] = result
+
+                                        if (result.length) {
+                                            row.data[column.code] = result[0].value
+                                        } else if (column.type === "input") {
+                                            row.data[column.code] = ""
+                                        } else if (column.type === "checkbox") {
+                                            row.data[column.code] = false
+                                        }
 
                                         cellOnCount++
                                         console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)

@@ -1,35 +1,25 @@
 import {FormCheck} from "react-bootstrap";
 import React from "react";
 import queryString from "query-string";
-import parse from "html-react-parser"
-
-const styles = {
-    noEditableCell: {
-        backgroundColor: '#f3f3f3',
-    },
-}
+import parse from 'html-react-parser'
 
 export default function TableCell(props) {
-    const queryStringParams = queryString.parse(window.location.search)
-    const clientName = queryStringParams.client_name
-    const projectName = queryStringParams.project_name
-    const projectCode = queryStringParams.project_code
-
     async function oninputCell(column, row, type, e) {
+        console.log("oninputCell")
         let queryLinkExist = '/proxy/project_bible_template/'
         let queryUpdateCell = '/proxy/project_bible_template/'
         let queryInsertCell = '/proxy/project_bible_template/'
         let value
 
         if (type === "input") {
-            queryLinkExist += 'projectBibleFilledCellTextByName'
-            queryUpdateCell += 'projectBibleOninputUpdateTextCell'
-            queryInsertCell += 'projectBibleOninputInsertTextCell'
-            value = e.target.innerText
+            queryLinkExist += 'projectBibleTemplateTextByNameIfExist'
+            queryUpdateCell += 'projectBibleTemplateOninputUpdateTextCell'
+            queryInsertCell += 'projectBibleTemplateOninputInsertTextCell'
+            value = e.target.innerHTML
         } else if (type === "checkbox") {
-            queryLinkExist += 'projectBibleFilledCellBoolByName'
-            queryUpdateCell += 'projectBibleOninputUpdateBoolCell'
-            queryInsertCell += 'projectBibleOninputInsertBoolCell'
+            queryLinkExist += 'projectBibleTemplateBoolByNameIfExist'
+            queryUpdateCell += 'projectBibleTemplateOninputUpdateBoolCell'
+            queryInsertCell += 'projectBibleTemplateOninputInsertBoolCell'
             value = e.target.checked
         }
 
@@ -39,28 +29,21 @@ export default function TableCell(props) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "clientName": clientName,
-                "projectName": projectName,
-                "projectCode": projectCode,
                 "colCode": column,
                 "rowCode": row
             })
         })
             .then(res => res.json())
             .then(
-                async (resultEditable) => {
-                    console.log("resultEditable", resultEditable)
-
-                    if (resultEditable.length) {
+                async (resultExist) => {
+                    if (resultExist.length) {
+                        console.log("resultExist.length")
                         await fetch(queryUpdateCell, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
                                 "colCode": column,
                                 "rowCode": row,
                                 "value": value
@@ -86,9 +69,6 @@ export default function TableCell(props) {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
                                 "colCode": column,
                                 "rowCode": row,
                                 "value": value
@@ -119,35 +99,19 @@ export default function TableCell(props) {
             )
     }
 
-    // console.log("TableCell", props.column.code, props.columnIndex, props.value, props.value[props.columnIndex])
-
     if (props.type === "input") {
-        if (props.editable) {
-            return (
-                <td contentEditable={true} suppressContentEditableWarning={true}
-                    onBlur={(e) =>
-                        oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
-            )
-        } else {
-            return (
-                <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
-            )
-        }
+        return (
+            <td contentEditable={true} suppressContentEditableWarning={true}
+                onBlur={(e) =>
+                    oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
+        )
     } else if (props.type === "checkbox") {
-        if (props.editable) {
-            return (
-                <td contentEditable={false} className="center align-middle">
-                    <FormCheck defaultChecked={props.value}
-                               onInput={(e) =>
-                                   oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
-                </td>
-            )
-        } else {
-            return (
-                <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
-                    <FormCheck checked={props.value} readOnly/>
-                </td>
-            )
-        }
+        return (
+            <td contentEditable={false} className="center align-middle">
+                <FormCheck defaultChecked={props.value}
+                           onInput={(e) =>
+                               oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+            </td>
+        )
     }
 }
