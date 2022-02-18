@@ -1,8 +1,21 @@
 import React, {useEffect, useState} from "react";
-import {Button, Table} from "react-bootstrap";
+import {Alert, Button, Table} from "react-bootstrap";
 import TableInfo from "../template_body/TableInfo";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus} from "@fortawesome/free-solid-svg-icons";
+import {faChevronDown, faChevronUp, faPlus, faTimes} from "@fortawesome/free-solid-svg-icons";
+
+const styles = {
+    alertMargin: {
+        marginLeft: '.5rem',
+        marginRight: '.5rem',
+    },
+
+    smallBtn: {
+        height: '25px',
+        paddingBottom: '0px',
+        paddingTop: '0px'
+    }
+}
 
 export default function ProjectBibleTemplateHeader(props) {
     const [error, setError] = useState(null);
@@ -13,6 +26,7 @@ export default function ProjectBibleTemplateHeader(props) {
     const [rows, setRows] = useState([{
         data: []
     }])
+    const [showAlert, setShowAlert] = useState(true)
     let cellAllCount = 0
     let cellOnCount = 0
 
@@ -399,6 +413,48 @@ export default function ProjectBibleTemplateHeader(props) {
 
         return(
             <div>
+                {
+                    showAlert &&
+                    <div style={styles.alertMargin}>
+                        <br />
+                        <Alert variant="primary" onClose={() => setShowAlert(false)} dismissible>
+                            <Alert.Heading>Памятка по редактированию строк с шаблоном:</Alert.Heading>
+                            <span>
+                                Каждая строка имеет свой индивидуальный код, в связи с этим:
+                                <br/>
+                                <br/>
+                                1. Если вы хотите изменить существующую строку, потому что она стала не нужна, и хотите
+                                добавить новую, то удалите ненужную и с нуля добавьте новую.
+                                <br/>
+                                2. Перемещение строк (кнопки: <Button size="sm" variant="primary"
+                                                                        style={styles.smallBtn}>
+                                <FontAwesomeIcon icon={faChevronUp}/></Button>&nbsp;<Button
+                                size="sm" variant="primary" style={styles.smallBtn}><FontAwesomeIcon
+                                icon={faChevronDown}/></Button>) меняет порядок следования строк.
+                                <br/>
+                                4. Добавление строки (кнопка: <Button size="sm" variant="success"
+                                                                      style={styles.smallBtn}><FontAwesomeIcon icon={faPlus}/></Button>) добавит ее после
+                                строки, в которой была нажата кнопка.
+                                <br/>
+                                5. Удаление строки (кнопка: <Button size="sm" variant="danger" style={styles.smallBtn}>
+                                <FontAwesomeIcon icon={faTimes}/></Button>) не удаляет ее из базы данных, а делает ее
+                                неактивной - так "удаленные" строки могут продолжать отображаться в отчетах, на момент
+                                заполнения которых эта строка еще существовала.
+                                <br/>
+                                А также для того, чтобы при создании новых строк не возникло ситуации с повторяющимся
+                                кодом, который уже ранее генерировался для другой строки.
+                                <br/>
+                                6. Добавление строки (кнопка: <Button size="sm" variant="primary"
+                                                                      style={styles.smallBtn}>Добавить&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus}/></Button>)
+                                добавит ее в конец.
+                                <br />
+                                7. Изменения в ячейках с галочками сохраняются по нажатию, текстовые изменения
+                                сохраняются как только вы переставляете курсор из редактируемой ячейки в любое другое
+                                место.
+                            </span>
+                        </Alert>
+                    </div>
+                }
                 <br />
                 <div className="managedQualityOnProjectBlockView">
                     <div className="row">

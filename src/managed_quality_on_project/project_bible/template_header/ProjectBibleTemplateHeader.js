@@ -413,7 +413,6 @@ export default function ProjectBibleTemplateHeader(props) {
         return(
             <div>
                 {
-                    //todo тут еще надо написать, что происходит при перемене галочек editable и template
                     showAlert &&
                     <div style={styles.alertMargin}>
                         <br />
