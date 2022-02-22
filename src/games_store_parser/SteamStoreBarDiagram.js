@@ -1,7 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import {Bar} from "react-chartjs-2";
 import logo from "../img/logo1.png";
 import {defaults} from "react-chartjs-2";
+import SteamBar from "./SteamBar";
 
 const styles = {
     blockView: {
@@ -29,50 +30,72 @@ const styles = {
 }
 
 export default function SteamStoreBarDiagram(props) {
-    let values = props.data;
-    let dataArray = [];
-    let labels = [];
-    let positiveData = [];
-    let negativeData = [];
+    let values = props.data
+    let dataArray = []
+    let labels = []
+    let positiveData = []
+    let negativeData = []
+    let allData = []
+    /*const [data, setData] = useState([{
+        data: []
+    }])*/
+    const [typeOfDataForBarDiagram, setTypeOfDataForBarDiagram] = React.useState([
+        {id: 'all', name: 'Деление на позитивные и негативные', checked: true},
+        {id: 'positive', name: 'Только позитивные', checked: false},
+        {id: 'negative', name: 'Только негативные', checked: false},
+        {id: 'summ', name: 'Без деления на позитивные и негативные', checked: false}
+    ])
+
+    function typeOfDataForBarDiagramClick(id) {
+        setTypeOfDataForBarDiagram(typeOfDataForBarDiagram.map(value => {
+            if (value.id === id) {
+                value.checked = !value.checked
+            } else {
+                value.checked = false
+            }
+
+            return value
+        }))
+    }
 
     if (props.clearLanguages) {
-        let otherData = [];
+        let otherData = []
 
         values.forEach(function (value, key) {
-            let persent = value.get("all") / props.allReviewsCount * 100;
-            persent = +persent.toFixed(2);
+            let perсent = value.get("all") / props.allReviewsCount * 100
+            perсent = +perсent.toFixed(2)
 
-            if (persent >= props.languageClearPercent) {
+            if (perсent >= props.languageClearPercent) {
                 dataArray.push({
                     label: key,
                     positive: value.get("positive"),
                     negative: value.get("negative"),
                     all: value.get("all"),
-                    percent: persent
-                });
+                    percent: perсent
+                })
             } else {
                 let otherItem = {
                     positive: value.get("positive"),
                     negative: value.get("negative"),
                     all: value.get("all"),
-                    percent: persent
+                    percent: perсent
                 }
 
-                otherData.push(otherItem);
+                otherData.push(otherItem)
             }
         })
 
         if (otherData.length) {
-            let otherPositiveValue = 0;
-            let otherNegativeValue = 0;
-            let otherAllValue = 0;
-            let otherPercentValue = 0;
+            let otherPositiveValue = 0
+            let otherNegativeValue = 0
+            let otherAllValue = 0
+            let otherPercentValue = 0
 
             for (let i = 0; i < otherData.length; i++) {
-                otherPositiveValue += otherData[i].positive;
-                otherNegativeValue += otherData[i].negative;
-                otherAllValue += otherData[i].all;
-                otherPercentValue += otherData[i].percent;
+                otherPositiveValue += otherData[i].positive
+                otherNegativeValue += otherData[i].negative
+                otherAllValue += otherData[i].all
+                otherPercentValue += otherData[i].percent
             }
 
             dataArray.push({
@@ -81,12 +104,12 @@ export default function SteamStoreBarDiagram(props) {
                 negative: otherNegativeValue,
                 all: otherAllValue,
                 percent: +otherPercentValue.toFixed(2)
-            });
+            })
         }
     } else {
         values.forEach(function (value, key) {
-            let persent = value.get("all") / props.allReviewsCount * 100;
-            persent = +persent.toFixed(2);
+            let persent = value.get("all") / props.allReviewsCount * 100
+            persent = +persent.toFixed(2)
 
             dataArray.push({
                 label: key,
@@ -94,25 +117,48 @@ export default function SteamStoreBarDiagram(props) {
                 negative: value.get("negative"),
                 all: value.get("all"),
                 percent: persent
-            });
+            })
         })
     }
 
     dataArray.sort(function(a, b) {
         if (a.label === "Other") {
-            return 1;
+            return 1
         } else {
-            return b.all - a.all;
+            return b.all - a.all
         }
-    });
+    })
 
     dataArray.forEach(function (value) {
-        labels.push(value.label);
-        positiveData.push(value.positive);
-        negativeData.push(value.negative);
-    });
+        labels.push(value.label)
+        positiveData.push(value.positive)
+        negativeData.push(value.negative)
+        allData.push(value.all)
+    })
 
-    defaults.font.size = 16;
+    defaults.font.size = 16
+
+    /*setData(
+        data.map(value => {
+            value.data.push({
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Negative',
+                        data: negativeData,
+                        backgroundColor: 'rgb(255, 99, 132)',
+                    },
+                    {
+                        label: 'Positive',
+                        data: positiveData,
+                        backgroundColor: 'rgb(54, 162, 235)',
+                    }
+                ]
+            })
+
+            return value
+        })
+    )*/
 
     let data = {
         labels: labels,
@@ -128,7 +174,7 @@ export default function SteamStoreBarDiagram(props) {
                 backgroundColor: 'rgb(54, 162, 235)',
             }
         ]
-    };
+    }
 
     let options = {
         responsive: true,
@@ -149,7 +195,7 @@ export default function SteamStoreBarDiagram(props) {
                 }
             }
         }
-    };
+    }
 
     return(
         <div>
@@ -196,6 +242,25 @@ export default function SteamStoreBarDiagram(props) {
                                     style={styles.inputPercent}/>
                             </div>
                         </div>
+                        <br />
+                        <br />
+                        {
+                            typeOfDataForBarDiagram.map(value => {
+                                return(
+                                    <div key={value.id} className="row">
+                                        <div className="col-sm-2 form-check">
+                                            <input type="checkbox" className="form-check-input"
+                                                   id={value.id}
+                                                   checked={value.checked}
+                                                   onChange={() => typeOfDataForBarDiagramClick(value.id)} style={styles.inputCheckbox}/>
+                                        </div>
+                                        <div className="col-sm-10">
+                                            <label className="form-check-label">{value.name}</label>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
             </div>
@@ -211,7 +276,12 @@ export default function SteamStoreBarDiagram(props) {
                     <h4>{props.appName}</h4>
                 </div>
             </div>
-            <Bar data={data} options={options} />
+            <SteamBar allChecked={typeOfDataForBarDiagram[0].checked}
+                      positiveChecked={typeOfDataForBarDiagram[1].checked}
+                      negativeChecked={typeOfDataForBarDiagram[2].checked}
+                      summChecked={typeOfDataForBarDiagram[3].checked} labels={labels} positiveData={positiveData}
+                      negativeData={negativeData} allData={allData} />
+            {/*<Bar data={data} options={options} />*/}
         </div>
     )
 }
