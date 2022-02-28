@@ -16,6 +16,7 @@
     "chart.js": "^3.5.1",
     "cors": "^2.8.5",
     "cors-anywhere": "^0.4.4",
+    "date-fns": "^2.28.0",
     "eslint-config-react-app": "^6.0.0",
     "express": "^4.17.1",
     "font-awesome": "^4.7.0",
