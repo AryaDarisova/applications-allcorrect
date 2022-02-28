@@ -49,6 +49,8 @@ export default function Form(props) {
                             </div>
                             <br />
                             <AdditionalFilter checked={props.gameStores} steamRemoveEnglish={props.steamRemoveEnglish}
+                                              steamAllTime={props.steamAllTime}
+                                              setSteamDateRange={props.setSteamDateRange}
                                               /*googlePlayFoundByFilter={props.googlePlayFoundByFilter}*/ />
                             <br />
                             <div className="row">

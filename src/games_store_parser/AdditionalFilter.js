@@ -1,39 +1,23 @@
-export default function AdditionalFilter({checked, steamRemoveEnglish/*, googlePlayFoundByFilter*/}) {
+import { DateRangePicker } from 'react-date-range';
+import { useState } from 'react';
+
+export default function AdditionalFilter({checked, steamRemoveEnglish, steamAllTime, setSteamDateRange}) {
     return(
         <div>
             {
                 checked.map(store => {
                     if (store.checked) {
                         if (store.id === "appStore") {
-                            /*return(
-                                <div key={store.id}>There is {store.name}</div>
-                            )*/
+
                         } else if (store.id === "googlePlay") {
-                            /*return (
-                                <div key={store.id}>
-                                    <div className="row">
-                                        <div className="col-sm-12">
-                                            <div className="form-check">
-                                                <input type="checkbox" className="form-check-input"
-                                                       id="googlePlayFoundByCountry" name="googlePlayFoundByCountry"
-                                                       checked={store.foundByCountry} onChange={() => googlePlayFoundByFilter(store.foundByCountry)}/>
-                                                <label className="form-check-label" htmlFor="googlePlayFoundByCountry">Искать по странам</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col-sm-12">
-                                            <div className="form-check">
-                                                <input type="checkbox" className="form-check-input"
-                                                       id="googlePlayFoundByLanguage" name="googlePlayFoundByLanguage"
-                                                       checked={store.foundByLanguage} onChange={() => googlePlayFoundByFilter(store.foundByLanguage)}/>
-                                                <label className="form-check-label" htmlFor="googlePlayFoundByLanguage">Искать по языкам</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )*/
+
                         } else if (store.id === "steam") {
+                            const selectionRange = {
+                                startDate: new Date(),
+                                endDate: new Date(),
+                                key: 'selection',
+                            }
+
                             return (
                                 <div key={store.id}>
                                     <div className="row">
@@ -54,6 +38,36 @@ export default function AdditionalFilter({checked, steamRemoveEnglish/*, googleP
                                             </div>
                                         </div>
                                     </div>
+                                    <br />
+                                    <div className="row">
+                                        <div className="col-sm-12">
+                                            <div className="form-check">
+                                                <input type="checkbox" className="form-check-input"
+                                                       id="steamAllTime" name="steamAllTime"
+                                                       checked={store.allTime} onChange={() => steamAllTime()}/>
+                                                <label className="form-check-label" htmlFor="steamAllTime">За все время</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    {
+                                        !store.allTime &&
+                                        <div className="row">
+                                            <div className="col-sm-12">
+                                                <label htmlFor="inputDateRange" className="form-label"><strong>Период
+                                                    выборки:</strong></label>
+                                                <br/>
+                                                <DateRangePicker
+                                                    onChange={item => setSteamDateRange([item.selection])}
+                                                    showSelectionPreview={true}
+                                                    moveRangeOnFirstSelection={false}
+                                                    months={1}
+                                                    ranges={store.dateRange}
+                                                    direction="horizontal"
+                                                />
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             )
                         }

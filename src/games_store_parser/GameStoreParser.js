@@ -8,7 +8,8 @@ export default function GameStoreParser(props) {
     let countSteamLanguages = 0;
 
     const [gameStores, setGameStores] = React.useState([
-        {id: 'googlePlay', name: 'Google Play', checked: false, infoReady: false, data: [], reviewsCount: 0,
+        {
+            id: 'googlePlay', name: 'Google Play', checked: false, infoReady: false, data: [], reviewsCount: 0,
             languageList: [
                 {id: "arabic", name: "Arabic", languageCodes: ['AR']},
                 {id: "chineseSimpl", name: "Chinese (Simpl)", languageCodes: ['ZH-CN']},
@@ -39,8 +40,10 @@ export default function GameStoreParser(props) {
                 {id: "thai", name: "Thai", languageCodes: ['TH']},
                 {id: "turkish", name: "Turkish", languageCodes: ['TR']},
                 {id: "vietnamese", name: "Vietnamese", languageCodes: ['VI']},
-            ]},
-        {id: 'appStore', name: 'App Store', checked: false, infoReady: false, data: [],
+            ]
+        },
+        {
+            id: 'appStore', name: 'App Store', checked: false, infoReady: false, data: [],
             countryList: [
                 //Localization country codes
                 {id: "arabic", name: "Arabic", countryCodes: ['EG', 'SA', 'AE']},
@@ -72,8 +75,10 @@ export default function GameStoreParser(props) {
                 {id: "turkish", name: "Turkish", countryCodes: ['TR']},
                 {id: "vietnamese", name: "Vietnamese", countryCodes: ['VN']},
                 {id: "czech", name: "Czech", countryCodes: ['CZ']},
-            ]},
-        {id: 'steam', name: 'Steam', checked: false, infoOnGet: false, infoReady: false, removeEnglish: false,
+            ]
+        },
+        {
+            id: 'steam', name: 'Steam', checked: false, infoOnGet: false, infoReady: false, removeEnglish: false,
             languageList: [
                 {id: "arabic", webId: "ar", name: "Arabic"},
                 {id: "brazilian", webId: "pt-BR", name: "Portuguese-Brazil"},
@@ -104,7 +109,15 @@ export default function GameStoreParser(props) {
                 {id: "turkish", webId: "tr", name: "Turkish"},
                 {id: "ukrainian", webId: "uk", name: "Ukrainian"},
                 {id: "vietnamese", webId: "vn", name: "Vietnamese"}
-            ],  data: [], languageClearPercent: 0.10, languageClearPercentOnInput: 0.10, appName: "", reviewsCount: 0},
+            ], data: [], languageClearPercent: 0.10, languageClearPercentOnInput: 0.10, appName: "", reviewsCount: 0,
+            allTime: true, dateRange: [
+                {
+                    startDate: new Date(),
+                    endDate: new Date(),
+                    key: 'selection'
+                }
+            ]
+        },
     ])
 
     function storeCLick(id) {
@@ -323,17 +336,39 @@ export default function GameStoreParser(props) {
 
         if (response.ok) {
             let json = await response.json();
+            let allTime = true
+            let reachBeginningOfTheDateRange = false
+            let reachEndOfTheDateRange = false
             console.log("steam", json);
 
             setGameStores(gameStores.map(store => {
                 if (store.id === "steam") {
                     for (let i = 0; i < json.reviews.length; i++) {
-                        let dataItem = {
-                            "language": getEngSteamId(store.languageList, json.reviews[i].language),
-                            "voted_up": json.reviews[i].voted_up
-                        };
+                        allTime = store.allTime
 
-                        store.data.push(dataItem);
+                        if (store.allTime) {
+                            let dataItem = {
+                                "language": getEngSteamId(store.languageList, json.reviews[i].language),
+                                "voted_up": json.reviews[i].voted_up
+                            };
+
+                            store.data.push(dataItem);
+                        } else {
+                            if (checkSteamDateRange(json.reviews[i].timestamp_created)) {
+                                reachBeginningOfTheDateRange = true
+
+                                let dataItem = {
+                                    "language": getEngSteamId(store.languageList, json.reviews[i].language),
+                                    "voted_up": json.reviews[i].voted_up
+                                };
+
+                                store.data.push(dataItem);
+                            } else if (reachBeginningOfTheDateRange) {
+                                reachEndOfTheDateRange = true
+
+                                break
+                            }
+                        }
                     }
 
                     store.reviewsCount += json.reviews.length;
@@ -342,14 +377,32 @@ export default function GameStoreParser(props) {
                 return store
             }))
 
-            if (cursor !== encodeURIComponent(json.cursor)) {
-                steamRekursivelyGetReviews(encodeURIComponent(json.cursor), appId, lang, langLength);
-            } else {
-                if (countSteamLanguages === (langLength - 1)) {
-                    setInfoOnGet("steam", false);
-                    setInfoReady("steam", true);
+            if (allTime) {
+                if (cursor !== encodeURIComponent(json.cursor)) {
+                    steamRekursivelyGetReviews(encodeURIComponent(json.cursor), appId, lang, langLength);
                 } else {
-                    countSteamLanguages++;
+                    if (countSteamLanguages === (langLength - 1)) {
+                        setInfoOnGet("steam", false);
+                        setInfoReady("steam", true);
+                    } else {
+                        countSteamLanguages++;
+                    }
+                }
+            } else {
+                //не достигли диапазона !reachBeginningOfTheDateRange - идем дальше
+                //достигли диапазона и закончили reachBeginningOfTheDateRange && reachEndOfTheDateRange - закончили
+                //достигли диапазона и не закончили reachBeginningOfTheDateRange && !reachEndOfTheDateRange - идем дальше
+                //закончили reachEndOfTheDateRange - закончили
+                if (cursor !== encodeURIComponent(json.cursor) &&
+                    (!reachBeginningOfTheDateRange || (reachBeginningOfTheDateRange && !reachEndOfTheDateRange))) {
+                    steamRekursivelyGetReviews(encodeURIComponent(json.cursor), appId, lang, langLength);
+                } else {
+                    if (countSteamLanguages === (langLength - 1)) {
+                        setInfoOnGet("steam", false);
+                        setInfoReady("steam", true);
+                    } else {
+                        countSteamLanguages++;
+                    }
                 }
             }
         } else {
@@ -387,11 +440,55 @@ export default function GameStoreParser(props) {
         }
     }
 
-    return(
+    function steamAllTime() {
+        setGameStores(gameStores.map(store => {
+            if (store.id === "steam") {
+                store.allTime = !store.allTime
+            }
+
+            return store
+        }))
+    }
+
+    function setSteamDateRange(range) {
+        setGameStores(gameStores.map(store => {
+            if (store.id === "steam") {
+                store.dateRange = range
+            }
+
+            return store
+        }))
+    }
+
+    function checkSteamDateRange(reviewDate) {
+        let check
+
+        setGameStores(gameStores.map(store => {
+            let startDate
+            let endDate
+
+            if (store.id === "steam") {
+                startDate = store.dateRange[0].startDate.getTime() / 1000
+                endDate = store.dateRange[0].endDate.getTime() / 1000 + 86400
+
+                console.log("startDate", store.dateRange[0].startDate, startDate,
+                    "endDate", store.dateRange[0].endDate, endDate, "reviewDate", reviewDate)
+
+                check = reviewDate >= startDate && reviewDate <= endDate
+            }
+
+            return store
+        }))
+
+        return check
+    }
+
+    return (
         <div className="wrapper">
             <Form gameStores={gameStores} storeCLick={storeCLick} getReviewsInfo={getReviewsInfo}
-                  steamRemoveEnglish={steamRemoveEnglish} />
-            <br />
+                  steamRemoveEnglish={steamRemoveEnglish} steamAllTime={steamAllTime}
+                  setSteamDateRange={setSteamDateRange}/>
+            <br/>
             <ReviewsInfo gameStores={gameStores} setSteamLanguageClearPercent={setSteamLanguageClearPercent}
                          setSteamLanguageClearPercentOnInput={setSteamLanguageClearPercentOnInput}/>
         </div>
