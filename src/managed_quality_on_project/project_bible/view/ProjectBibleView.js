@@ -852,7 +852,7 @@ export default function ProjectBibleView(props) {
                             clientViewsList.map(info => {
                                 let cutDate = value["date_create"].substr(0, 10)
                                 let correctDate = new Date(cutDate);
-                                correctDate.setDate(correctDate.getDate() + 1)
+                                // correctDate.setDate(correctDate.getDate() + 1)
 
                                 info.data.push({
                                     code: value.code,
