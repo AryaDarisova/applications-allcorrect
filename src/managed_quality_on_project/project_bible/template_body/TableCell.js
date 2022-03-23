@@ -15,7 +15,7 @@ export default function TableCell(props) {
             queryLinkExist += 'projectBibleTemplateTextByNameIfExist'
             queryUpdateCell += 'projectBibleTemplateOninputUpdateTextCell'
             queryInsertCell += 'projectBibleTemplateOninputInsertTextCell'
-            value = e.target.innerHTML
+            value = e.target.innerText
         } else if (type === "checkbox") {
             queryLinkExist += 'projectBibleTemplateBoolByNameIfExist'
             queryUpdateCell += 'projectBibleTemplateOninputUpdateBoolCell'

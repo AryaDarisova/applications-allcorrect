@@ -13,6 +13,7 @@ router.post('/projectBibleTemplateMoveUpColumn', projectBibleTemplateController.
 router.post('/projectBibleTemplateMoveDownColumn', projectBibleTemplateController.setProjectBibleTemplateMoveDownColumn)
 router.post('/projectBibleTemplateDecNumPredDeleteColumn', projectBibleTemplateController.setProjectBibleTemplateDecNumPredDeleteColumn)
 router.post('/projectBibleTemplateDeleteColumn', projectBibleTemplateController.setProjectBibleTemplateDeleteColumn)
+router.post('/projectBibleColumnsForClientTemplate', projectBibleTemplateController.getProjectBibleColumnsForClientTemplate)
 
 //Запросы к таблице project_bible_template_tags
 router.get('/projectBibleTemplateTags', projectBibleTemplateController.getProjectBibleTemplateTags)
@@ -52,6 +53,8 @@ router.post('/projectBibleTemplateOninputInsertBoolCell', projectBibleTemplateCo
 //Запросы к таблице project_bible_info
 router.post('/projectBibleInfo', projectBibleTemplateController.getProjectBibleInfo)
 router.post('/projectBibleInfoInsert', projectBibleTemplateController.setProjectBibleInfoInsert)
+router.post('/projectBibleInfoMoveUpRow', projectBibleTemplateController.setProjectBibleInfoMoveUpRow)
+router.post('/projectBibleInfoMoveDownRow', projectBibleTemplateController.setProjectBibleInfoMoveDownRow)
 
 //Запросы к таблице project_bible_text
 router.post('/projectBibleFilledCellTextByName', projectBibleTemplateController.getProjectBibleTextGetCellValue)
@@ -63,6 +66,23 @@ router.post('/projectBibleFilledCellBoolByName', projectBibleTemplateController.
 router.post('/projectBibleOninputUpdateBoolCell', projectBibleTemplateController.setProjectBibleOninputUpdateBoolCell)
 router.post('/projectBibleOninputInsertBoolCell', projectBibleTemplateController.setProjectBibleOninputInsertBoolCell)
 
+//Запросы к таблице project_bible_client_view
+router.get('/projectBibleClientViewGenerateIndividualCode', projectBibleTemplateController.projectBibleClientViewGenerateIndividualCode)
+router.post('/projectBibleClientViewInsert', projectBibleTemplateController.setProjectBibleClientViewInsert)
+router.post('/projectBibleClientView', projectBibleTemplateController.getProjectBibleClientView)
+router.post('/projectBibleClientViewByCode', projectBibleTemplateController.getProjectBibleClientViewByCode)
+router.post('/projectBibleClientViewDelete', projectBibleTemplateController.setProjectBibleClientViewDelete)
+router.post('/createProjectBiblePdf', projectBibleTemplateController.setCreateProjectBiblePdf)
+
+//Запросы к таблице project_bible_client_view_text
+router.post('/projectBibleClientViewFilledCellTextByName', projectBibleTemplateController.getProjectBibleClientViewTextGetCellValue)
+router.post('/projectBibleClientViewOninputUpdateTextCell', projectBibleTemplateController.setProjectBibleClientViewOninputUpdateTextCell)
+router.post('/projectBibleClientViewOninputInsertTextCell', projectBibleTemplateController.setProjectBibleClientViewOninputInsertTextCell)
+
+//Запросы к таблице project_bible_client_view_bool
+router.post('/projectBibleClientViewFilledCellBoolByName', projectBibleTemplateController.getProjectBibleClientViewBoolGetCellValue)
+router.post('/projectBibleClientViewOninputUpdateBoolCell', projectBibleTemplateController.setProjectBibleClientViewOninputUpdateBoolCell)
+router.post('/projectBibleClientViewOninputInsertBoolCell', projectBibleTemplateController.setProjectBibleClientViewOninputInsertBoolCell)
 
 
 
@@ -84,8 +104,6 @@ router.get('/projectBibleTemplateText', projectBibleTemplateController.getProjec
 router.post('/projectBibleOninputPredSave', projectBibleTemplateController.predSetProjectBibleOninputSave)
 router.post('/projectBibleOninputInsertRow', projectBibleTemplateController.predSetProjectBibleOninputInsertSave)
 router.post('/projectBibleOninputUpdateRow', projectBibleTemplateController.predSetProjectBibleOninputUpdateSave)
-
-// router.post('/projectBibleInfoInsert', projectBibleTemplateController.setProjectBibleInfoInsert)
 
 router.post('/projectBibleGetFilledCells', projectBibleTemplateController.getProjectBibleFilledCell)
 

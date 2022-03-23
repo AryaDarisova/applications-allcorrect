@@ -120,6 +120,14 @@ class ProjectBibleTemplateController {
         res.json(queryDeleteColumn)
     }
 
+    async getProjectBibleColumnsForClientTemplate(req, res) {
+        const columns = await db.query(
+            'SELECT code, name, type, editable, template FROM project_bible_template WHERE active = true AND col_for_client = true ORDER BY num'
+        )
+
+        res.json({"columns": columns.rows})
+    }
+
     //Запросы к таблице project_bible_template_tags
     async getProjectBibleTemplateTags(req, res) {
         const tags = await db.query(
@@ -412,6 +420,26 @@ class ProjectBibleTemplateController {
         res.json(queryResult)
     }
 
+    async setProjectBibleInfoMoveUpRow(req, res) {
+        const {clientName, projectName, projectCode, rows} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_info SET rows = $4 WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
+            [clientName, projectName, projectCode, JSON.stringify(rows)]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleInfoMoveDownRow(req, res) {
+        const {clientName, projectName, projectCode, rows} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_info SET rows = $4 WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
+            [clientName, projectName, projectCode, JSON.stringify(rows)]
+        )
+
+        res.json(queryResult)
+    }
+
     //Запросы к таблице project_bible_text
     async getProjectBibleTextGetCellValue(req, res) {
         const {clientName, projectName, projectCode, rowCode, colCode} = req.body
@@ -473,6 +501,134 @@ class ProjectBibleTemplateController {
 
         res.json(queryResult)
     }
+
+    //Запросы к таблице project_bible_client_view
+    async projectBibleClientViewGenerateIndividualCode(req, res) {
+        let abc = "abcdefghijklmnopqrstuvwxyz1234567890-";
+        let individualCode = "";
+
+        while (individualCode.length < 36) {
+            individualCode += abc[Math.floor(Math.random() * abc.length)];
+        }
+
+        const exist = await db.query('SELECT * FROM project_bible_client_view WHERE code = $1', [individualCode])
+
+        res.json({"individualCode": individualCode, "exist": exist.rows})
+    }
+
+    async setProjectBibleClientViewInsert(req, res) {
+        const {clientName, projectName, projectCode, code, columns, rows} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_client_view (client_name, project_name, project_code, code, columns, rows) VALUES ($1, $2, $3, $4, $5, $6)',
+            [clientName, projectName, projectCode, code, JSON.stringify(columns), JSON.stringify(rows)]
+        )
+
+        res.json(queryResult)
+    }
+
+    async getProjectBibleClientView(req, res) {
+        const {clientName, projectName, projectCode} = req.body
+        const value = await db.query(
+            'SELECT code, columns, rows, date_create FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
+            [clientName, projectName, projectCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async getProjectBibleClientViewByCode(req, res) {
+        const {clientName, projectName, projectCode, code} = req.body
+        const value = await db.query(
+            'SELECT code, columns, rows, date_create FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3 AND code = $4',
+            [clientName, projectName, projectCode, code]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleClientViewDelete(req, res) {
+        const {code} = req.body
+        const value = await db.query(
+            'DELETE FROM project_bible_client_view WHERE code = $1',
+            [code]
+        )
+
+        res.json(value)
+    }
+
+    async setCreateProjectBiblePdf(req, res) {
+        // const {data} = req.body
+
+        res.json({hello: "klnjnjnlk"})
+    }
+
+    //Запросы к таблице project_bible_client_view_text
+    async getProjectBibleClientViewTextGetCellValue(req, res) {
+        const {code, rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_client_view_text WHERE view_code = $1 AND row_code = $2 AND col_code = $3',
+            [code, rowCode, colCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleClientViewOninputUpdateTextCell(req, res) {
+        const {code, rowCode, colCode, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_client_view_text SET value = $4 WHERE view_code = $1 AND row_code = $2 AND col_code = $3',
+            [code, rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleClientViewOninputInsertTextCell(req, res) {
+        const {code, rowCode, colCode, value} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_client_view_text (view_code, row_code, col_code, value) VALUES ($1, $2, $3, $4)',
+            [code, rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+    //Запросы к таблице project_bible_client_view_bool
+    async getProjectBibleClientViewBoolGetCellValue(req, res) {
+        const {code, rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_client_view_bool WHERE view_code = $1 AND row_code = $2 AND col_code = $3',
+            [code, rowCode, colCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleClientViewOninputUpdateBoolCell(req, res) {
+        const {code, rowCode, colCode, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_client_view_bool SET value = $4 WHERE view_code = $1 AND row_code = $2 AND col_code = $3',
+            [code, rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleClientViewOninputInsertBoolCell(req, res) {
+        const {code, rowCode, colCode, value} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_client_view_bool (code, row_code, col_code, value) VALUES ($1, $2, $3, $4)',
+            [code, rowCode, colCode, value]
+        )
+
+        res.json(queryResult)
+    }
+
+
+
+
+
+
 
 
 

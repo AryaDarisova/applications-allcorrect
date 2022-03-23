@@ -1,35 +1,17 @@
 import {FormCheck} from "react-bootstrap";
-import React, {useState} from "react";
+import React from "react";
 import queryString from "query-string";
 import parse from "html-react-parser"
 
 const styles = {
-    defaultCell: {
-        backgroundColor: '#fff',
-    },
-
     noEditableCell: {
         backgroundColor: '#f3f3f3',
     },
-
-    emptyCell: {
-        backgroundColor: '#f8e7e7',
-    },
-
-    filledCell: {
-        backgroundColor: '#dffdde',
-    },
-
-    changedCheckbox: {
-        backgroundColor: '#f6f0d8',
-    }
 }
 
 export default function TableCell(props) {
     const queryStringParams = queryString.parse(window.location.search)
-    const clientName = queryStringParams.client_name
-    const projectName = queryStringParams.project_name
-    const projectCode = queryStringParams.project_code
+    const code = queryStringParams.code
 
     async function oninputCell(column, row, type, e) {
         let queryLinkExist = '/proxy/project_bible_template/'
@@ -38,14 +20,14 @@ export default function TableCell(props) {
         let value
 
         if (type === "input") {
-            queryLinkExist += 'projectBibleFilledCellTextByName'
-            queryUpdateCell += 'projectBibleOninputUpdateTextCell'
-            queryInsertCell += 'projectBibleOninputInsertTextCell'
+            queryLinkExist += 'projectBibleClientViewFilledCellTextByName'
+            queryUpdateCell += 'projectBibleClientViewOninputUpdateTextCell'
+            queryInsertCell += 'projectBibleClientViewOninputInsertTextCell'
             value = e.target.innerText
         } else if (type === "checkbox") {
-            queryLinkExist += 'projectBibleFilledCellBoolByName'
-            queryUpdateCell += 'projectBibleOninputUpdateBoolCell'
-            queryInsertCell += 'projectBibleOninputInsertBoolCell'
+            queryLinkExist += 'projectBibleClientViewFilledCellBoolByName'
+            queryUpdateCell += 'projectBibleClientViewOninputUpdateBoolCell'
+            queryInsertCell += 'projectBibleClientViewOninputInsertBoolCell'
             value = e.target.checked
         }
 
@@ -55,9 +37,7 @@ export default function TableCell(props) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "clientName": clientName,
-                "projectName": projectName,
-                "projectCode": projectCode,
+                "code": code,
                 "colCode": column,
                 "rowCode": row
             })
@@ -65,8 +45,6 @@ export default function TableCell(props) {
             .then(res => res.json())
             .then(
                 async (resultEditable) => {
-                    console.log("resultEditable", resultEditable)
-
                     if (resultEditable.length) {
                         await fetch(queryUpdateCell, {
                             method: 'POST',
@@ -74,9 +52,7 @@ export default function TableCell(props) {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
+                                "code": code,
                                 "colCode": column,
                                 "rowCode": row,
                                 "value": value
@@ -102,9 +78,7 @@ export default function TableCell(props) {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
+                                "code": code,
                                 "colCode": column,
                                 "rowCode": row,
                                 "value": value
@@ -135,12 +109,10 @@ export default function TableCell(props) {
             )
     }
 
-    // console.log("TableCell", props.column.code, props.columnIndex, props.value, props.value[props.columnIndex])
-
-    if (props.type === "input") {
-        if (props.editable) {
+    if (props.column.type === "input") {
+        if (props.column.clientColumn) {
             return (
-                <td contentEditable={true} suppressContentEditableWarning={true} style={props.value === "" ? styles.emptyCell : styles.filledCell}
+                <td contentEditable={true} suppressContentEditableWarning={true}
                     onBlur={(e) =>
                         oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
             )
@@ -149,8 +121,8 @@ export default function TableCell(props) {
                 <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
             )
         }
-    } else if (props.type === "checkbox") {
-        if (props.editable) {
+    } else if (props.column.type === "checkbox") {
+        if (props.column.clientColumn) {
             return (
                 <td contentEditable={false} className="center align-middle">
                     <FormCheck defaultChecked={props.value}

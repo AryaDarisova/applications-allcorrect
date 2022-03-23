@@ -1,0 +1,13 @@
+.tableFixHead div.table-responsive {
+    overflow: auto;
+    height: 45em;
+}
+
+/*
+!*.p-multiselect.p-multiselect-label-container*!.p-multiselect-label {
+    padding: 5px;
+}*/
+
+.multiselect-custom-style div.p-multiselect-label {
+    padding: 0.4rem;
+}
