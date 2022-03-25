@@ -3,6 +3,8 @@ import {Button} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFilePdf, faTimes, faLink, faCopy} from "@fortawesome/free-solid-svg-icons";
 import { jsPDF } from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 
 const styles = {
     blockView: {
@@ -23,7 +25,7 @@ export default function ClientViewList(props) {
     }
 
     async function createPdf(code) {
-        await fetch("/proxy/project_bible_template/projectBibleClientView", {
+        await fetch("/proxy/project_bible_template/projectBibleClientViewByCode", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -135,9 +137,9 @@ export default function ClientViewList(props) {
                                     // row.data[column.code] = result[0].value
 
                                     if (column.type === "input") {
-                                        row.data[column.code] = result[0].value
+                                        row.data[column.code] = result[0].value.replace(/<br>/g, " ")
                                     } else if (column.type === "checkbox") {
-                                        row.data[column.code] = result[0].value ? "✓" : ""
+                                        row.data[column.code] = result[0].value ? "YES" : ""
                                     }
                                 } else {
                                     row.data[column.code] = ""
@@ -199,18 +201,18 @@ export default function ClientViewList(props) {
                                                     // row.data[column.code] = resultEditable[0].value
 
                                                     if (column.type === "input") {
-                                                        row.data[column.code] = resultEditable[0].value
+                                                        row.data[column.code] = resultEditable[0].value.replace(/<br>/g, " ")
                                                     } else if (column.type === "checkbox") {
-                                                        row.data[column.code] = resultEditable[0].value ? "✓" : ""
+                                                        row.data[column.code] = resultEditable[0].value ? "YES" : ""
                                                     }
                                                 } else {
                                                     if (resultTemplate.length) {
                                                         // row.data[column.code] = resultTemplate[0].value
 
                                                         if (column.type === "input") {
-                                                            row.data[column.code] = resultTemplate[0].value
+                                                            row.data[column.code] = resultTemplate[0].value.replace(/<br>/g, " ")
                                                         } else if (column.type === "checkbox") {
-                                                            row.data[column.code] = resultTemplate[0].value ? "✓" : ""
+                                                            row.data[column.code] = resultTemplate[0].value ? "YES" : ""
                                                         }
                                                     } else {
                                                         row.data[column.code] = ""
@@ -250,9 +252,9 @@ export default function ClientViewList(props) {
                                         // row.data[column.code] = result[0].value
 
                                         if (column.type === "input") {
-                                            row.data[column.code] = result[0].value
+                                            row.data[column.code] = result[0].value.replace(/<br>/g, " ")
                                         } else if (column.type === "checkbox") {
-                                            row.data[column.code] = result[0].value ? "✓" : ""
+                                            row.data[column.code] = result[0].value ? "YES" : ""
                                         }
                                     } else {
                                         row.data[column.code] = ""
@@ -289,9 +291,9 @@ export default function ClientViewList(props) {
                                         // row.data[column.code] = result[0].value
 
                                         if (column.type === "input") {
-                                            row.data[column.code] = result[0].value
+                                            row.data[column.code] = result[0].value.replace(/<br>/g, " ")
                                         } else if (column.type === "checkbox") {
-                                            row.data[column.code] = result[0].value ? "✓" : ""
+                                            row.data[column.code] = result[0].value ? "YES" : ""
                                         }
                                     } else {
                                         row.data[column.code] = ""
@@ -314,98 +316,85 @@ export default function ClientViewList(props) {
     }
 
     function downloadPdf(columns, rows) {
-        console.log("downloadPdf", columns, rows)
+        pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-        const doc = new jsPDF(
-            { putOnlyUsedFonts: true, orientation: "portrait" }
-        );
+        let docDefinition = {
+            pageOrientation: 'landscape',
+            content: [
+                {text: 'Project Bible\n\n\n', style: 'header', alignment: 'center', fontSize: 16},
+                // {text: '', style: 'subheader', fontSize: 18},
+                {
+                    style: 'tableExample',
+                    fontSize: 10,
+                    table: {
+                        headerRows: 1,
+                        dontBreakRows: true,
+                        body: rowsForDownloadPdf(columns, rows) /*[
+                            [
+                            headersForDownloadPdf(columns)
+                                /!*{text: 'Header 1', style: 'tableHeader', fontSize: 10},
+                                {text: 'Header 2', style: 'tableHeader', fontSize: 10},
+                                {text: 'Header 3', style: 'tableHeader', fontSize: 10}*!/
+                            ],
+                            /!*[
+                                {text: 'Project Bible', fontSize: 10},
+                                {text: 'Project Bible', fontSize: 10},
+                                {text: 'Project Bible', fontSize: 10},
+                            ]*!/
+                            rowsForDownloadPdf(columns, rows)
+                        ]*/
+                    }
+                },
+            ]
+        }
 
-        // doc.addFont("/src/managed_quality_on_project/fonts/PT_Sans-Web-Regular.ttf", "PTSans", "regular");
-        // doc.setFont("PTSans");
-
-        doc.text("Project Bible", 105, 20, null, null, "center");
-        doc.table(20, 40, rowsForDownloadPdf(columns, rows), headersForDownloadPdf(columns),
-            { printHeaders: true, autoSize: true, fontSize: 10, headerBackgroundColor: '#fafafa' });
-
-        doc.save("project_bible.pdf");
+        pdfMake.createPdf(docDefinition).download();
     }
 
-    function headersForDownloadPdf(columns) {
-        let headers = [];
+    function rowsForDownloadPdf(columns, rows) {
+        let data = []
+        let headers = []
 
         headers.push({
-            id: "Num",
-            name: "Num",
-            prompt: "Num",
-            width: 65,
-            align: "center",
-            padding: 0
+            text: '№',
+            style: 'tableHeader',
+            fontSize: 10,
+            bold: true
         })
 
         columns.map(column => {
             headers.push({
-                id: column.code,
-                name: column.code,
-                prompt: column.name,
-                width: 65,
-                align: "center",
-                padding: 0
+                text: column.name,
+                style: 'tableHeader',
+                fontSize: 10,
+                bold: true
             });
 
             return column
         })
 
-        /*for (var i = 0; i < columns.length; i += 1) {
-            headers.push({
-                id: columns.name,
-                name: columns.name,
-                prompt: columns.name,
-                width: 65,
-                align: "center",
-                padding: 0
-            });
-        }*/
-
-        console.log("headersForDownloadPdf", headers)
-        return headers
-    }
-
-    function rowsForDownloadPdf(columns, rows) {
-        let data = []
+        data.push(headers)
 
         rows.map((row, index) => {
             let value = []
 
-            value["Num"] = String(index + 1)
-
-            console.log("rowsForDownloadPdf", row)
+            value.push({
+                text: String(index + 1),
+                style: 'tableHeader',
+                fontSize: 10
+            });
 
             columns.map(column => {
-                value[column.code] = row.data[column.code]
+                value.push({
+                    text: String(row.data[column.code]),
+                    style: 'tableHeader',
+                    fontSize: 10
+                });
             })
 
-            // data.push(value)
-            data.push(Object.assign({}, value))
+            data.push(value)
+            // data.push(Object.assign({}, value))
         })
-
-        /*
-        var generateData = function(amount) {
-            var result = [];
-            var data = {
-                coin: "100",
-                game_group: "GameGroup",
-                game_name: "XPTO2",
-                game_version: "25",
-                machine: "20485861",
-                vlt: "0"
-            };
-            for (var i = 0; i < amount; i += 1) {
-                data.id = (i + 1).toString();
-                result.push(Object.assign({}, data));
-            }
-            return result;
-        };
-*/
 
         console.log("rowsForDownloadPdf", data)
         return data

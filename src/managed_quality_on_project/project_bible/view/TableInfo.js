@@ -1,5 +1,5 @@
-import {FormCheck, Table} from "react-bootstrap";
-import React, {useEffect, useRef, useState} from "react";
+import {Table} from "react-bootstrap";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import TableRow from "../view/TableRow";
 
 const styles = {
@@ -32,37 +32,10 @@ const styles = {
 }
 
 export default function TableInfo(props) {
-    /*const [tableHeight, setTableHeight] = useState("auto");
-    const [activeIndex, setActiveIndex] = useState(null);
-    const [columnsCount, setColumnsCount] = useState(0);
-    const tableElement = useRef(null);
-
-    const tableStyle = (columnsCount) => ({
-        borderCollapse: 'collapse',
-        width: '100%',
-        overflow: 'auto',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(' + columnsCount + ', minmax(100px, 1fr))'
-    });
-
-    useEffect(() => {
-        setTableHeight(tableElement.current.offsetHeight);
-
-        props.columns.map(column => {
-            if (column.filter.show) {
-                setColumnsCount(columnsCount + 1)
-            }
-        })
-    }, []);
-
-    const mouseDown = (index) => {
-        setActiveIndex(index);
-    };*/
-
     console.log("props.columns, props.rows", props.columns, props.rows)
 
     return (
-        <Table responsive bordered style={styles.tableFixHeadTable}>
+        <Table responsive bordered style={styles.tableFixHeadTable} >
             <thead>
             <tr>
                 <th key="№" className="center" style={styles.tableFixHeadTh}>№</th>

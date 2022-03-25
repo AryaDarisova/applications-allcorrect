@@ -918,6 +918,12 @@ export default function ProjectBibleView(props) {
             </div>
         )
     } else {
+        let columnsTable = []
+
+        columnsTable.push({
+            
+        })
+
         return(
             <div className="managedQualityOnProjectBlockView">
                 <div className="row">

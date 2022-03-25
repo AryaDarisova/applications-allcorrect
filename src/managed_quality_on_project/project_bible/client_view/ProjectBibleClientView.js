@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from "react";
 import queryString from 'query-string';
-import {Form} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import TableInfo from "../client_view/TableInfo";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faFilePdf} from "@fortawesome/free-solid-svg-icons";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 
 export default function ProjectBibleClientView(props) {
     const [error, setError] = useState(null)
@@ -21,12 +25,16 @@ export default function ProjectBibleClientView(props) {
         data: []
     }])
 
+    const [rowsPdf, setRowsPdf] = useState([{
+        data: []
+    }])
+
     let cellAllCount = 0
     let cellOnCount = 0
 
-    useEffect(async () => {
-        console.log("code", code)
+    const [clientColumnCount, setClientColumnCount] = useState(0)
 
+    useEffect(async () => {
         await fetch("/proxy/project_bible_template/projectBibleClientViewByCode", {
             method: 'POST',
             headers: {
@@ -55,6 +63,7 @@ export default function ProjectBibleClientView(props) {
                                     if (resultColumnsForClient.columns.length) {
                                         cellAllCount = (result[0].columns.length +
                                             resultColumnsForClient.columns.length) * result[0].rows.length
+                                        setClientColumnCount(resultColumnsForClient.columns.length)
 
                                         result[0].columns.map(value => {
                                             setColumns(
@@ -335,6 +344,142 @@ export default function ProjectBibleClientView(props) {
         }))
     }
 
+    function createPdf(code, countClientColumns) {
+        let rowsPdf = rows[0].data
+        let clientCellOncount = 0
+
+        rowsPdf.map(row => {
+            columns.map(columnsData => {
+                columnsData.data.map(async column => {
+                    if (column.clientColumn) {
+                        let queryLinkClient = '/proxy/project_bible_template/'
+
+                        if (column.type === "input") {
+                            queryLinkClient += 'projectBibleClientViewFilledCellTextByName'
+                        } else if (column.type === "checkbox") {
+                            queryLinkClient += 'projectBibleClientViewFilledCellBoolByName'
+                        }
+
+                        await fetch(queryLinkClient, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "code": code,
+                                "rowCode": row.code,
+                                "colCode": column.code,
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(
+                                async (result) => {
+                                    if (result.length) {
+                                        row.data[column.code] = result[0].value.replace(/<br>/g, " ")
+                                    } else {
+                                        if (column.type === "input") {
+                                            row.data[column.code] = ""
+                                        } else if (column.type === "checkbox") {
+                                            row.data[column.code] = false
+                                        }
+                                    }
+
+                                    clientCellOncount++
+                                    console.log("createPdf", clientCellOncount)
+
+                                    if (clientCellOncount === countClientColumns * rowsPdf.length) {
+                                        pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+                                        let docDefinition = {
+                                            pageOrientation: 'landscape',
+                                            content: [
+                                                {text: 'Project Bible\n\n\n', style: 'header', alignment: 'center', fontSize: 16},
+                                                {
+                                                    style: 'tableExample',
+                                                    fontSize: 10,
+                                                    table: {
+                                                        headerRows: 1,
+                                                        dontBreakRows: true,
+                                                        body: rowsForDownloadPdf(columns[0].data, rowsPdf)
+                                                    }
+                                                },
+                                            ]
+                                        }
+
+                                        pdfMake.createPdf(docDefinition).download();
+                                    }
+                                },
+                                (error) => {
+
+                                }
+                            )
+                    }
+
+                    return column
+                })
+
+                return columnsData
+            })
+
+            return row
+        })
+    }
+
+    function rowsForDownloadPdf(columns, rows) {
+        let data = []
+        let headers = []
+
+        headers.push({
+            text: '№',
+            style: 'tableHeader',
+            fontSize: 10,
+            bold: true
+        })
+
+        columns.map(column => {
+            headers.push({
+                text: column.name,
+                style: 'tableHeader',
+                fontSize: 10,
+                bold: true
+            });
+
+            return column
+        })
+
+        data.push(headers)
+
+        rows.map((row, index) => {
+            let value = []
+
+            value.push({
+                text: String(index + 1),
+                style: 'tableHeader',
+                fontSize: 10
+            });
+
+            columns.map(column => {
+                if (column.type === "input") {
+                    value.push({
+                        text: String(row.data[column.code].replace(/<br>/g, " ")),
+                        style: 'tableHeader',
+                        fontSize: 10
+                    });
+                } else if (column.type === "checkbox") {
+                    value.push({
+                        text: String(row.data[column.code] ? "YES" : ""),
+                        style: 'tableHeader',
+                        fontSize: 10
+                    });
+                }
+            })
+
+            data.push(value)
+        })
+
+        return data
+    }
+
     if (error) {
         return (
             <div className="row">
@@ -375,8 +520,11 @@ export default function ProjectBibleClientView(props) {
                             </Form.Group>
                         </Form>
                     </div>
-                    <div className="col-sm-4">
-
+                    <div className="col-sm-4 center">
+                        <br />
+                        <Button variant="primary" onClick={(e) => createPdf(code, clientColumnCount)}>
+                            Выгрузить pdf&nbsp;&nbsp;<FontAwesomeIcon icon={faFilePdf}/>
+                        </Button>
                     </div>
                 </div>
                 <br />
