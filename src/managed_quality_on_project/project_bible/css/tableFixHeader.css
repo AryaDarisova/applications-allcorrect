@@ -1,6 +1,7 @@
 .tableFixHead div.table-responsive {
     overflow: auto;
     height: 45em;
+    /*width:200%;*/
 }
 
 /*
@@ -10,4 +11,22 @@
 
 .multiselect-custom-style div.p-multiselect-label {
     padding: 0.4rem;
+}
+
+.columnResizer {
+    padding: 0px;
+    width: 0px;
+}
+
+.resizableTable thead {
+    background-color: #282c34;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.resizableTable .columnResizer {
+    background-color: rgb(223, 226, 230);
+    padding-left: 1px;
+    padding-right: 1px;
 }

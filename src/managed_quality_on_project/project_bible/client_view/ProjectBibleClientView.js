@@ -523,7 +523,7 @@ export default function ProjectBibleClientView(props) {
                     <div className="col-sm-4 center">
                         <br />
                         <Button variant="primary" onClick={(e) => createPdf(code, clientColumnCount)}>
-                            Выгрузить pdf&nbsp;&nbsp;<FontAwesomeIcon icon={faFilePdf}/>
+                            Download pdf&nbsp;&nbsp;<FontAwesomeIcon icon={faFilePdf}/>
                         </Button>
                     </div>
                 </div>

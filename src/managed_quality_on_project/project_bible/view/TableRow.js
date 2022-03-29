@@ -3,6 +3,7 @@ import TableCell from "../view/TableCell";
 import {Button} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronDown, faChevronUp, faPlus, faTimes} from "@fortawesome/free-solid-svg-icons";
+import ColumnResizer from "react-column-resizer";
 
 const styles = {
     noEditableCell: {
@@ -22,12 +23,19 @@ export default function TableRow(props) {
                 props.columns.map((column, columnIndex) => {
                     if (column.filter.show) {
                         return(
-                            <TableCell key={props.row.code + "_" + column.code} editable={column.editable}
+                            <>
+                                <ColumnResizer key={props.row.code + "-" + column.code} className="columnResizer"/>
+                                <TableCell key={props.row.code + "_" + column.code} editable={column.editable}
                                        type={column.type} column={column} rowCode={props.row.code}
                                        value={props.row.data[column.code]} columnIndex={columnIndex}/>
+                            </>
                         )
                     }
                 })
+            }
+            {
+                props.actionColumn &&
+                <ColumnResizer className="columnResizer"/>
             }
             {
                 props.actionColumn &&

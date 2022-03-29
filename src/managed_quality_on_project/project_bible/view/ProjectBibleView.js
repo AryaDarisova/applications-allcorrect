@@ -6,7 +6,8 @@ import ClientViewList from "../view/ClientViewList";
 import queryString from 'query-string';
 import "../css/tableFixHeader.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFilePdf, faFilter, faUserTie} from "@fortawesome/free-solid-svg-icons";
+import {faFilePdf, faFilter, faUserTie, faFileExcel} from "@fortawesome/free-solid-svg-icons";
+import XLSX from "xlsx";
 
 const styles = {
     blockView: {
@@ -899,6 +900,76 @@ export default function ProjectBibleView(props) {
             )
     }
 
+    function createExcel() {
+        let wb = XLSX.utils.book_new()
+        let ws_data = excelData()
+        let ws = XLSX.utils.aoa_to_sheet(ws_data)
+
+        wb.Props = {
+            Title: "Project Bible",
+            Subject: "Project Bible",
+            Author: "Allcorrect"
+        }
+
+        wb.SheetNames.push("Project_Bible")
+        wb.Sheets["Project_Bible"] = ws
+        XLSX.writeFile(wb, "project_bible.xlsx")
+    }
+
+    function excelData() {
+        let data = []
+        let rowCount = 1
+
+        columns.map(info => {
+            let headers = []
+
+            headers.push("№")
+
+            info.data.map(column => {
+                if (column.filter.show) {
+                    headers.push(column.name)
+                }
+
+                return column
+            })
+
+            data.push(headers)
+
+            return info
+        })
+
+        rows.map(rowInfo => {
+            rowInfo.data.map((row, index) => {
+                if (row.show) {
+                    let value = []
+
+                    value.push(rowCount++)
+
+                    columns.map(columnInfo => {
+                        columnInfo.data.map(column => {
+                            if (column.filter.show) {
+                                value.push(row.data[column.code])
+                            }
+
+                            return column
+                        })
+
+                        return columnInfo
+                    })
+
+                    data.push(value)
+                }
+
+                return row
+            })
+
+            return rowInfo
+        })
+
+        console.log("excelData", data)
+        return data
+    }
+
     if (error) {
         return (
             <div className="row">
@@ -976,6 +1047,10 @@ export default function ProjectBibleView(props) {
                     <div className="col-sm-12 center">
                         <Button variant="dark" onClick={(e) => createClientView()}>
                             Создать страницу для клиента&nbsp;&nbsp;<FontAwesomeIcon icon={faUserTie} />
+                        </Button>
+                        &nbsp;&nbsp;
+                        <Button variant="success" onClick={(e) => createExcel()}>
+                            Выгрузить excel&nbsp;&nbsp;<FontAwesomeIcon icon={faFileExcel}/>
                         </Button>
                     </div>
                 </div>

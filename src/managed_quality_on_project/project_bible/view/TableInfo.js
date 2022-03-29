@@ -1,6 +1,7 @@
 import {Table} from "react-bootstrap";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import TableRow from "../view/TableRow";
+import ColumnResizer from "react-column-resizer"
 
 const styles = {
     noEditableCell: {
@@ -35,7 +36,7 @@ export default function TableInfo(props) {
     console.log("props.columns, props.rows", props.columns, props.rows)
 
     return (
-        <Table responsive bordered style={styles.tableFixHeadTable} >
+        <Table className="resizableTable" responsive bordered style={styles.tableFixHeadTable} >
             <thead>
             <tr>
                 <th key="№" className="center" style={styles.tableFixHeadTh}>№</th>
@@ -43,10 +44,17 @@ export default function TableInfo(props) {
                     props.columns.map(column => {
                         if (column.filter.show) {
                             return (
-                                <th key={column.name} className="center" style={styles.tableFixHeadTh}>{column.name}</th>
+                                <>
+                                    <ColumnResizer key={column.code} className="columnResizer"/>
+                                    <th key={column.name} className="center" style={styles.tableFixHeadTh}>{column.name}</th>
+                                </>
                             )
                         }
                     })
+                }
+                {
+                    props.actionColumn &&
+                    <ColumnResizer className="columnResizer"/>
                 }
                 {
                     props.actionColumn &&
