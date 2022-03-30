@@ -424,6 +424,8 @@ export default function ClientViewList(props) {
                                 <div className="col-sm-12">
                                     Дата создания: {value.date}
                                     &nbsp;&nbsp;
+                                    { value.submit ? <b>(Завершена)</b> : <b>(В процессе)</b> }
+                                    &nbsp;&nbsp;
                                     <Button variant="light" onClick={(e) => openLink(value.code)}>
                                         Открыть ссылку&nbsp;&nbsp;<FontAwesomeIcon icon={faLink}/>
                                     </Button>

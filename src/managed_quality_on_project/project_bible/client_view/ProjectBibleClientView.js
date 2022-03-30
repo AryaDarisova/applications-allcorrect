@@ -29,6 +29,8 @@ export default function ProjectBibleClientView(props) {
         data: []
     }])
 
+    const [submit, setSubmit] = useState(false)
+
     let cellAllCount = 0
     let cellOnCount = 0
 
@@ -64,6 +66,10 @@ export default function ProjectBibleClientView(props) {
                                         cellAllCount = (result[0].columns.length +
                                             resultColumnsForClient.columns.length) * result[0].rows.length
                                         setClientColumnCount(resultColumnsForClient.columns.length)
+
+                                        if (result[0].submit) {
+                                            setSubmit(true)
+                                        }
 
                                         result[0].columns.map(value => {
                                             setColumns(
@@ -480,6 +486,30 @@ export default function ProjectBibleClientView(props) {
         return data
     }
 
+    async function submitClientView() {
+        console.log("submitClientView", code)
+
+        await fetch("/proxy/project_bible_template/projectBibleClientViewSubmit", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "code": code,
+                "value": true
+            }),
+        })
+            .then(res => res.json())
+            .then(
+                async (result) => {
+                    setSubmit(true)
+                },
+                (error) => {
+
+                }
+            )
+    }
+
     if (error) {
         return (
             <div className="row">
@@ -530,9 +560,20 @@ export default function ProjectBibleClientView(props) {
                 <br />
                 <div className="row">
                     <div className="col-sm-12 tableFixHead">
-                        {<TableInfo columns={columns[0].data} rows={rows[0].data} />}
+                        {<TableInfo columns={columns[0].data} rows={rows[0].data} submit={submit} />}
                     </div>
                 </div>
+                <br />
+                {
+                    !submit &&
+                    <div className="row">
+                        <div className="col-sm-12 center">
+                            <Button variant="primary" onClick={(e) => submitClientView()}>
+                                Submit
+                            </Button>
+                        </div>
+                    </div>
+                }
             </div>
         )
     }

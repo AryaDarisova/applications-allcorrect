@@ -45,7 +45,7 @@ export default function TableInfo(props) {
             {
                 props.rows.map((row, rowIndex) => {
                     return (
-                        <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns} />
+                        <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns} submit={props.submit} />
                     )
                 })
             }

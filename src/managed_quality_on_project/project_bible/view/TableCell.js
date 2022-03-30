@@ -10,14 +10,17 @@ const styles = {
 
     noEditableCell: {
         backgroundColor: '#f3f3f3',
+        whiteSpace: 'pre-line',
     },
 
     emptyCell: {
         backgroundColor: '#f8e7e7',
+        whiteSpace: 'pre-line',
     },
 
     filledCell: {
         backgroundColor: '#dffdde',
+        whiteSpace: 'pre-line',
     },
 
     changedCheckbox: {
@@ -142,11 +145,11 @@ export default function TableCell(props) {
             return (
                 <td contentEditable={true} suppressContentEditableWarning={true} style={props.value === "" ? styles.emptyCell : styles.filledCell}
                     onBlur={(e) =>
-                        oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
+                        oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
             )
         } else {
             return (
-                <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
+                <td contentEditable={false} style={styles.noEditableCell}>{props.value}</td>
             )
         }
     } else if (props.type === "checkbox") {

@@ -9,7 +9,7 @@ export default function TableRow(props) {
                 props.columns.map((column, columnIndex) => {
                     return(
                         <TableCell key={props.row.code + "_" + column.code} column={column} rowCode={props.row.code}
-                                   value={props.row.data[column.code]} columnIndex={columnIndex}/>
+                                   value={props.row.data[column.code]} columnIndex={columnIndex} submit={props.submit} />
                     )
                 })
             }

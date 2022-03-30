@@ -529,7 +529,7 @@ class ProjectBibleTemplateController {
     async getProjectBibleClientView(req, res) {
         const {clientName, projectName, projectCode} = req.body
         const value = await db.query(
-            'SELECT code, columns, rows, date_create FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
+            'SELECT code, columns, rows, date_create, submit FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
             [clientName, projectName, projectCode]
         )
 
@@ -539,7 +539,7 @@ class ProjectBibleTemplateController {
     async getProjectBibleClientViewByCode(req, res) {
         const {clientName, projectName, projectCode, code} = req.body
         const value = await db.query(
-            'SELECT code, columns, rows, date_create FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3 AND code = $4',
+            'SELECT code, columns, rows, date_create, submit FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3 AND code = $4',
             [clientName, projectName, projectCode, code]
         )
 
@@ -553,6 +553,16 @@ class ProjectBibleTemplateController {
             [code]
         )
 
+        const deleteText = await db.query(
+            'DELETE FROM project_bible_client_view_text WHERE view_code = $1',
+            [code]
+        )
+
+        const deleteBool = await db.query(
+            'DELETE FROM project_bible_client_view_bool WHERE view_code = $1',
+            [code]
+        )
+
         res.json(value)
     }
 
@@ -560,6 +570,16 @@ class ProjectBibleTemplateController {
         // const {data} = req.body
 
         res.json({hello: "klnjnjnlk"})
+    }
+
+    async setProjectBibleClientViewSubmit(req, res) {
+        const {code, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_client_view SET submit = $2 WHERE code = $1',
+            [code, value]
+        )
+
+        res.json(queryResult)
     }
 
     //Запросы к таблице project_bible_client_view_text

@@ -3,6 +3,12 @@ import React from "react";
 import queryString from "query-string";
 import parse from 'html-react-parser'
 
+const styles = {
+    cell: {
+        whiteSpace: 'pre-line',
+    }
+}
+
 export default function TableCell(props) {
     async function oninputCell(column, row, type, e) {
         console.log("oninputCell")
@@ -101,7 +107,7 @@ export default function TableCell(props) {
 
     if (props.type === "input") {
         return (
-            <td contentEditable={true} suppressContentEditableWarning={true}
+            <td contentEditable={true} suppressContentEditableWarning={true} style={styles.cell}
                 onBlur={(e) =>
                     oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
         )

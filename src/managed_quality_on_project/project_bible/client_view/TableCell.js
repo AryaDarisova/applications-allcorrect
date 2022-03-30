@@ -6,7 +6,12 @@ import parse from "html-react-parser"
 const styles = {
     noEditableCell: {
         backgroundColor: '#f3f3f3',
+        whiteSpace: 'pre-line',
     },
+
+    editableCell: {
+        whiteSpace: 'pre-line',
+    }
 }
 
 export default function TableCell(props) {
@@ -111,11 +116,17 @@ export default function TableCell(props) {
 
     if (props.column.type === "input") {
         if (props.column.clientColumn) {
-            return (
-                <td contentEditable={true} suppressContentEditableWarning={true}
-                    onBlur={(e) =>
-                        oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
-            )
+            if (props.submit) {
+                return (
+                    <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
+                )
+            } else {
+                return (
+                    <td contentEditable={true} suppressContentEditableWarning={true} style={styles.editableCell}
+                        onBlur={(e) =>
+                            oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
+                )
+            }
         } else {
             return (
                 <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
@@ -123,13 +134,21 @@ export default function TableCell(props) {
         }
     } else if (props.column.type === "checkbox") {
         if (props.column.clientColumn) {
-            return (
-                <td contentEditable={false} className="center align-middle">
-                    <FormCheck defaultChecked={props.value}
-                               onInput={(e) =>
-                                   oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
-                </td>
-            )
+            if (props.submit) {
+                return (
+                    <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
+                        <FormCheck checked={props.value} readOnly/>
+                    </td>
+                )
+            } else {
+                return (
+                    <td contentEditable={false} className="center align-middle">
+                        <FormCheck defaultChecked={props.value}
+                                   onInput={(e) =>
+                                       oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+                    </td>
+                )
+            }
         } else {
             return (
                 <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">

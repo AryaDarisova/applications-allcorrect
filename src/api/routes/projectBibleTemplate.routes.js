@@ -73,6 +73,7 @@ router.post('/projectBibleClientView', projectBibleTemplateController.getProject
 router.post('/projectBibleClientViewByCode', projectBibleTemplateController.getProjectBibleClientViewByCode)
 router.post('/projectBibleClientViewDelete', projectBibleTemplateController.setProjectBibleClientViewDelete)
 router.post('/createProjectBiblePdf', projectBibleTemplateController.setCreateProjectBiblePdf)
+router.post('/projectBibleClientViewSubmit', projectBibleTemplateController.setProjectBibleClientViewSubmit)
 
 //Запросы к таблице project_bible_client_view_text
 router.post('/projectBibleClientViewFilledCellTextByName', projectBibleTemplateController.getProjectBibleClientViewTextGetCellValue)

@@ -7,7 +7,7 @@ import {faChevronDown, faChevronUp, faPlus, faTimes} from "@fortawesome/free-sol
 const styles = {
     nowrapCell: {
         whiteSpace: 'nowrap'
-    },
+    }
 }
 
 export default function TableRow(props) {
@@ -19,7 +19,7 @@ export default function TableRow(props) {
                     return(
                         <TableCell key={props.row.code + "_" + column.code}
                                    type={column.type} column={column} rowCode={props.row.code}
-                                   value={props.row.data[column.code]} columnIndex={columnIndex}/>
+                                   value={props.row.data[column.code]} columnIndex={columnIndex} />
                     )
                 })
             }

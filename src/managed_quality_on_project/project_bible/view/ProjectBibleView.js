@@ -473,7 +473,6 @@ export default function ProjectBibleView(props) {
                                 .then(
                                     async (result) => {
                                         // console.log("columns[i].editable", result)
-
                                         if (result.length) {
                                             // row.data.push(result[0].value)
                                             row.data[column.code] = result[0].value
@@ -766,6 +765,7 @@ export default function ProjectBibleView(props) {
                                         clientViewsList.map(info => {
                                             info.data.push({
                                                 code: resultGenerate.individualCode,
+                                                submit: false,
                                                 date: new Date().toJSON().slice(0,10).replace(/-/g,'-')
                                             })
 
@@ -857,6 +857,7 @@ export default function ProjectBibleView(props) {
 
                                 info.data.push({
                                     code: value.code,
+                                    submit: value.submit,
                                     date: correctDate.toISOString().split('T')[0]
                                 })
 
