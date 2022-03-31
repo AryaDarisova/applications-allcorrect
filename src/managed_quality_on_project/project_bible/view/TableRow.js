@@ -26,8 +26,9 @@ export default function TableRow(props) {
                             <>
                                 <ColumnResizer key={props.row.code + "-" + column.code} className="columnResizer"/>
                                 <TableCell key={props.row.code + "_" + column.code} editable={column.editable}
-                                       type={column.type} column={column} rowCode={props.row.code}
-                                       value={props.row.data[column.code]} columnIndex={columnIndex}/>
+                                           template={column.template} type={column.type} column={column}
+                                           rowCode={props.row.code} value={props.row.data[column.code]}
+                                           columnIndex={columnIndex} row={props.row} />
                             </>
                         )
                     }

@@ -194,7 +194,8 @@ export default function ProjectBibleView(props) {
                                     info.data.push({
                                         "code": value.code,
                                         "show": true,
-                                        "data": []
+                                        "data": [],
+                                        "template": []
                                     });
 
                                     return info
@@ -359,6 +360,16 @@ export default function ProjectBibleView(props) {
 
                                                     if (resultEditable.length) {
                                                         row.data[column.code] = resultEditable[0].value
+
+                                                        if (column.type === "checkbox") {
+                                                            if (resultTemplate.length) {
+                                                                console.log("тут должен быть шаблон и он есть", resultTemplate)
+                                                                row.template[column.code] = resultTemplate[0].value
+                                                            } else {
+                                                                console.log("тут должен быть шаблон", resultTemplate)
+                                                                row.template[column.code] = false
+                                                            }
+                                                        }
                                                         /*if (column.type === "input") {
                                                             row.data[column.code] = resultEditable[0].value
                                                         } else if (column.type === "checkbox") {
@@ -376,14 +387,10 @@ export default function ProjectBibleView(props) {
                                                     } else {
                                                         if (resultTemplate.length) {
                                                             row.data[column.code] = resultTemplate[0].value
-                                                            /*if (column.type === "input") {
-                                                                row.data[column.code] = resultTemplate[0].value
-                                                            } else if (column.type === "checkbox") {
-                                                                row.data[column.code] = {
-                                                                    edit: resultTemplate[0].value,
-                                                                    template: resultTemplate[0].value
-                                                                }
-                                                            }*/
+
+                                                            if (column.type === "checkbox") {
+                                                                row.template[column.code] = resultTemplate[0].value
+                                                            }
 
                                                             if (resultTemplate[0].value) {
                                                                 setDataForSelectInColumn(column.code, resultTemplate[0].value)
@@ -392,6 +399,7 @@ export default function ProjectBibleView(props) {
                                                             row.data[column.code] = ""
                                                         } else if (column.type === "checkbox") {
                                                             row.data[column.code] = false
+                                                            row.template[column.code] = false
                                                             /*row.data[column.code] = {
                                                                 edit: false,
                                                                 template: false

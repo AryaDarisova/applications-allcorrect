@@ -33,6 +33,10 @@ export default function TableCell(props) {
     const clientName = queryStringParams.client_name
     const projectName = queryStringParams.project_name
     const projectCode = queryStringParams.project_code
+    const [cellInputColor, setCellInputColor] = useState(props.value ? "green" : "red")
+    const [cellCheckboxColor, setCellCheckboxColor] = useState(
+        props.type === "checkbox" && props.template && props.editable && props.value !== props.row.template[props.column.code] ? "yellow" : "white"
+    )
 
     async function oninputCell(column, row, type, e) {
         let queryLinkExist = '/proxy/project_bible_template/'
@@ -45,11 +49,25 @@ export default function TableCell(props) {
             queryUpdateCell += 'projectBibleOninputUpdateTextCell'
             queryInsertCell += 'projectBibleOninputInsertTextCell'
             value = e.target.innerText
+
+            if (value) {
+                setCellInputColor("green")
+            } else {
+                setCellInputColor("red")
+            }
         } else if (type === "checkbox") {
             queryLinkExist += 'projectBibleFilledCellBoolByName'
             queryUpdateCell += 'projectBibleOninputUpdateBoolCell'
             queryInsertCell += 'projectBibleOninputInsertBoolCell'
             value = e.target.checked
+
+            if (props.template && props.editable) {
+                if (value === props.row.template[props.column.code]) {
+                    setCellCheckboxColor("white")
+                } else {
+                    setCellCheckboxColor("yellow")
+                }
+            }
         }
 
         await fetch(queryLinkExist, {
@@ -142,11 +160,25 @@ export default function TableCell(props) {
 
     if (props.type === "input") {
         if (props.editable) {
-            return (
+            if (cellInputColor === "green") {
+                return (
+                    <td contentEditable={true} suppressContentEditableWarning={true} style={styles.filledCell}
+                        onBlur={(e) =>
+                            oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
+                )
+            } else if (cellInputColor === "red") {
+                return (
+                    <td contentEditable={true} suppressContentEditableWarning={true} style={styles.emptyCell}
+                        onBlur={(e) =>
+                            oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
+                )
+            }
+
+            /*return (
                 <td contentEditable={true} suppressContentEditableWarning={true} style={props.value === "" ? styles.emptyCell : styles.filledCell}
                     onBlur={(e) =>
                         oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
-            )
+            )*/
         } else {
             return (
                 <td contentEditable={false} style={styles.noEditableCell}>{props.value}</td>
@@ -154,13 +186,25 @@ export default function TableCell(props) {
         }
     } else if (props.type === "checkbox") {
         if (props.editable) {
-            return (
-                <td contentEditable={false} className="center align-middle">
-                    <FormCheck defaultChecked={props.value}
-                               onInput={(e) =>
-                                   oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
-                </td>
-            )
+            console.log(props.type, props.template, props.editable, props.value, props.row.template[props.column.code])
+
+            if (cellCheckboxColor === "white") {
+                return (
+                    <td contentEditable={false} className="center align-middle" style={styles.defaultCell}>
+                        <FormCheck defaultChecked={props.value}
+                                   onInput={(e) =>
+                                       oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+                    </td>
+                )
+            } else if (cellCheckboxColor === "yellow") {
+                return (
+                    <td contentEditable={false} className="center align-middle" style={styles.changedCheckbox}>
+                        <FormCheck defaultChecked={props.value}
+                                   onInput={(e) =>
+                                       oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+                    </td>
+                )
+            }
         } else {
             return (
                 <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">

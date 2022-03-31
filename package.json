@@ -50,8 +50,8 @@
     "xlsx": "^0.17.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts --max_old_space_size=2048 build",
+    "start": "react-scripts --max_old_space_size=2048 start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "nodemon ./src/api/server.js"
