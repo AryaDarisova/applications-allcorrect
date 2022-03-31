@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, ProgressBar} from "react-bootstrap";
 import TableInfo from "../view/TableInfo";
 import Filter from "../view/Filter";
 import ClientViewList from "../view/ClientViewList";
@@ -16,12 +16,17 @@ const styles = {
         borderRadius: '5px',
         margin: '0px'
     },
+
+    progressBar: {
+        margin: '10rem 10rem'
+    },
 }
 
 export default function ProjectBibleView(props) {
     const [error, setError] = useState(null)
     const [isLoaded, setIsLoaded] = useState(false)
     const [actionColumn, setActionColumn] = useState(true)
+    const [progressPercent, setProgressPercent] = useState(0)
 
     const queryStringParams = queryString.parse(window.location.search)
     const clientName = queryStringParams.client_name
@@ -396,6 +401,7 @@ export default function ProjectBibleView(props) {
 
                                                     cellOnCount++
                                                     console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                                    setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                                     if (cellOnCount === cellAllCount && !error) {
                                                         setIsLoaded(true);
@@ -445,6 +451,7 @@ export default function ProjectBibleView(props) {
 
                                         cellOnCount++
                                         console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                        setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                         if (cellOnCount === cellAllCount && !error) {
                                             setIsLoaded(true);
@@ -492,6 +499,7 @@ export default function ProjectBibleView(props) {
 
                                         cellOnCount++
                                         console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                        setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                         if (cellOnCount === cellAllCount && !error) {
                                             setIsLoaded(true);
@@ -982,10 +990,16 @@ export default function ProjectBibleView(props) {
         )
     } else if (!isLoaded) {
         return (
-            <div className="row">
-                <div className="col-sm-12 center">
-                    <br />
-                    <h3>Загрузка...</h3>
+            <div className="row" style={styles.progressBar}>
+                <div className="col-sm-4">
+
+                </div>
+                <div className="col-sm-4 center">
+                    <h4>Loading...</h4>
+                    <ProgressBar now={progressPercent} label={`${progressPercent}%`} />
+                </div>
+                <div className="col-sm-4">
+
                 </div>
             </div>
         )

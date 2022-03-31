@@ -1,15 +1,22 @@
 import React, {useEffect, useState} from "react";
 import queryString from 'query-string';
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, ProgressBar} from "react-bootstrap";
 import TableInfo from "../client_view/TableInfo";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFilePdf} from "@fortawesome/free-solid-svg-icons";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
+const styles = {
+    progressBar: {
+        margin: '10rem 10rem'
+    },
+}
+
 export default function ProjectBibleClientView(props) {
     const [error, setError] = useState(null)
     const [isLoaded, setIsLoaded] = useState(false)
+    const [progressPercent, setProgressPercent] = useState(0)
 
     const queryStringParams = queryString.parse(window.location.search)
     const clientName = queryStringParams.client_name
@@ -183,6 +190,7 @@ export default function ProjectBibleClientView(props) {
 
                                         cellOnCount++
                                         console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                        setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                         if (cellOnCount === cellAllCount && !error) {
                                             setIsLoaded(true);
@@ -249,6 +257,7 @@ export default function ProjectBibleClientView(props) {
 
                                                         cellOnCount++
                                                         console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                                        setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                                         if (cellOnCount === cellAllCount && !error) {
                                                             setIsLoaded(true);
@@ -289,6 +298,7 @@ export default function ProjectBibleClientView(props) {
 
                                             cellOnCount++
                                             console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                            setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                             if (cellOnCount === cellAllCount && !error) {
                                                 setIsLoaded(true);
@@ -328,6 +338,7 @@ export default function ProjectBibleClientView(props) {
 
                                             cellOnCount++
                                             console.log("cellOnCount, cellAllCount", cellOnCount, cellAllCount)
+                                            setProgressPercent(Math.round(cellOnCount / cellAllCount * 100))
 
                                             if (cellOnCount === cellAllCount && !error) {
                                                 setIsLoaded(true);
@@ -391,7 +402,6 @@ export default function ProjectBibleClientView(props) {
                                     }
 
                                     clientCellOncount++
-                                    console.log("createPdf", clientCellOncount)
 
                                     if (clientCellOncount === countClientColumns * rowsPdf.length) {
                                         pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -487,8 +497,6 @@ export default function ProjectBibleClientView(props) {
     }
 
     async function submitClientView() {
-        console.log("submitClientView", code)
-
         await fetch("/proxy/project_bible_template/projectBibleClientViewSubmit", {
             method: 'POST',
             headers: {
@@ -521,10 +529,16 @@ export default function ProjectBibleClientView(props) {
         )
     } else if (!isLoaded) {
         return (
-            <div className="row">
-                <div className="col-sm-12 center">
-                    <br />
-                    <h3>Loading...</h3>
+            <div className="row" style={styles.progressBar}>
+                <div className="col-sm-4">
+
+                </div>
+                <div className="col-sm-4 center">
+                    <h4>Loading...</h4>
+                    <ProgressBar now={progressPercent} label={`${progressPercent}%`} />
+                </div>
+                <div className="col-sm-4">
+
                 </div>
             </div>
         )
