@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Button} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFilePdf, faTimes, faLink, faCopy} from "@fortawesome/free-solid-svg-icons";
-import { jsPDF } from "jspdf";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
