@@ -1,5 +1,5 @@
 import {Table} from "react-bootstrap";
-import React from "react";
+import React, {useState} from "react";
 import TableRow from "../client_view/TableRow";
 
 const styles = {
@@ -45,7 +45,8 @@ export default function TableInfo(props) {
             {
                 props.rows.map((row, rowIndex) => {
                     return (
-                        <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns} submit={props.submit} />
+                        <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns}
+                                  submit={props.submit} />
                     )
                 })
             }

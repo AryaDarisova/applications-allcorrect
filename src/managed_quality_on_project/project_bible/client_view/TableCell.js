@@ -11,6 +11,11 @@ const styles = {
 
     editableCell: {
         whiteSpace: 'pre-line',
+    },
+
+    filledRow: {
+        backgroundColor: '#dffdde',
+        whiteSpace: 'pre-line',
     }
 }
 
@@ -117,9 +122,21 @@ export default function TableCell(props) {
     if (props.column.type === "input") {
         if (props.column.clientColumn) {
             if (props.submit) {
-                return (
+                if (props.value) {
+                    props.setFilledRowColor(true)
+
+                    return (
+                        <td contentEditable={false} style={styles.filledRow}>{parse(props.value)}</td>
+                    )
+                } else {
+                    return (
+                        <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
+                    )
+                }
+
+                /*return (
                     <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
-                )
+                )*/
             } else {
                 return (
                     <td contentEditable={true} suppressContentEditableWarning={true} style={styles.editableCell}
@@ -128,18 +145,44 @@ export default function TableCell(props) {
                 )
             }
         } else {
-            return (
+            if (props.filledRowColor) {
+                return (
+                    <td contentEditable={false} style={styles.filledRow}>{parse(props.value)}</td>
+                )
+            } else {
+                return (
+                    <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
+                )
+            }
+
+            /*return (
                 <td contentEditable={false} style={styles.noEditableCell}>{parse(props.value)}</td>
-            )
+            )*/
         }
     } else if (props.column.type === "checkbox") {
         if (props.column.clientColumn) {
             if (props.submit) {
-                return (
+                if (props.value) {
+                    props.setFilledRowColor(true)
+
+                    return (
+                        <td contentEditable={false} style={styles.filledRow} className="center align-middle">
+                            <FormCheck checked={props.value} readOnly/>
+                        </td>
+                    )
+                } else {
+                    return (
+                        <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
+                            <FormCheck checked={props.value} readOnly/>
+                        </td>
+                    )
+                }
+
+                /*return (
                     <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
                         <FormCheck checked={props.value} readOnly/>
                     </td>
-                )
+                )*/
             } else {
                 return (
                     <td contentEditable={false} className="center align-middle">
@@ -150,11 +193,25 @@ export default function TableCell(props) {
                 )
             }
         } else {
-            return (
+            if (props.filledRowColor) {
+                return (
+                    <td contentEditable={false} style={styles.filledRow} className="center align-middle">
+                        <FormCheck checked={props.value} readOnly/>
+                    </td>
+                )
+            } else {
+                return (
+                    <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
+                        <FormCheck checked={props.value} readOnly/>
+                    </td>
+                )
+            }
+
+            /*return (
                 <td contentEditable={false} style={styles.noEditableCell} className="center align-middle">
                     <FormCheck checked={props.value} readOnly/>
                 </td>
-            )
+            )*/
         }
     }
 }

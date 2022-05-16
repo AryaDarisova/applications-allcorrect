@@ -38,7 +38,7 @@ export default function TableCell(props) {
         props.type === "checkbox" && props.template && props.editable && props.value !== props.row.template[props.column.code] ? "yellow" : "white"
     )
 
-    async function oninputCell(column, row, type, e) {
+    async function oninputCell(column, row, type, e, oldValue) {
         let queryLinkExist = '/proxy/project_bible_template/'
         let queryUpdateCell = '/proxy/project_bible_template/'
         let queryInsertCell = '/proxy/project_bible_template/'
@@ -70,90 +70,129 @@ export default function TableCell(props) {
             }
         }
 
-        await fetch(queryLinkExist, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "clientName": clientName,
-                "projectName": projectName,
-                "projectCode": projectCode,
-                "colCode": column,
-                "rowCode": row
-            })
-        })
-            .then(res => res.json())
-            .then(
-                async (resultEditable) => {
-                    console.log("resultEditable", resultEditable)
-
-                    if (resultEditable.length) {
-                        await fetch(queryUpdateCell, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
-                                "colCode": column,
-                                "rowCode": row,
-                                "value": value
-                            })
-                        })
-                            .then(res => res.json())
-                            .then(
-                                async (resultUpdate) => {
-
-                                },
-                                (error) => {
-                                    alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
-                                        "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
-                                        "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
-                                        "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
-                                        "верное значение")
-                                }
-                            )
-                    } else {
-                        await fetch(queryInsertCell, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                "clientName": clientName,
-                                "projectName": projectName,
-                                "projectCode": projectCode,
-                                "colCode": column,
-                                "rowCode": row,
-                                "value": value
-                            })
-                        })
-                            .then(res => res.json())
-                            .then(
-                                async (resultInsert) => {
-
-                                },
-                                (error) => {
-                                    alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
-                                        "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
-                                        "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
-                                        "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
-                                        "верное значение")
-                                }
-                            )
-                    }
+        if (value !== oldValue) {
+            await fetch(queryLinkExist, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 },
-                (error) => {
-                    alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
-                        "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
-                        "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
-                        "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
-                        "верное значение")
+                body: JSON.stringify({
+                    "clientName": clientName,
+                    "projectName": projectName,
+                    "projectCode": projectCode,
+                    "colCode": column,
+                    "rowCode": row
+                })
+            })
+                .then(res => res.json())
+                .then(
+                    async (resultEditable) => {
+                        console.log("resultEditable", resultEditable)
+
+                        if (resultEditable.length) {
+                            await fetch(queryUpdateCell, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    "clientName": clientName,
+                                    "projectName": projectName,
+                                    "projectCode": projectCode,
+                                    "colCode": column,
+                                    "rowCode": row,
+                                    "value": value
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(
+                                    async (resultUpdate) => {
+
+                                    },
+                                    (error) => {
+                                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                                            "верное значение")
+                                    }
+                                )
+                        } else {
+                            await fetch(queryInsertCell, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    "clientName": clientName,
+                                    "projectName": projectName,
+                                    "projectCode": projectCode,
+                                    "colCode": column,
+                                    "rowCode": row,
+                                    "value": value
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(
+                                    async (resultInsert) => {
+
+                                    },
+                                    (error) => {
+                                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                                            "верное значение")
+                                    }
+                                )
+                        }
+                    },
+                    (error) => {
+                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                            "верное значение")
+                    }
+                )
+        }
+    }
+
+    function pressKey(colCode, rowNum) {
+        let pressed = new Set()
+
+        document.addEventListener('keydown', function(event) {
+            pressed.add(event.code)
+            console.log("pressed.add", pressed)
+
+            if (pressed.has("ShiftLeft") && pressed.has("ArrowUp")) {
+                let newId = rowNum === 1 ? rowNum : rowNum - 1
+
+                console.log("ShiftLeft + ArrowUp", pressed, colCode + "_" + newId)
+                document.getElementById(colCode + "_" + newId).focus()
+
+                // return
+            } else if (pressed.has("ShiftLeft") && pressed.has("ArrowDown")) {
+                let newId = rowNum + 1
+
+                if(document.getElementById(colCode + "_" + newId)) {
+                    console.log("ShiftLeft + ArrowDown", pressed, colCode + "_" + newId)
+                    document.getElementById(colCode + "_" + newId).focus()
                 }
-            )
+
+                // return
+            } else {
+                return
+            }
+
+            pressed.clear()
+        });
+
+        document.addEventListener('keyup', function(event) {
+            console.log("keyup", pressed)
+            pressed.delete(event.code)
+            console.log("keyup delete", pressed)
+        });
     }
 
     // console.log("TableCell", props.column.code, props.columnIndex, props.value, props.value[props.columnIndex])
@@ -163,14 +202,18 @@ export default function TableCell(props) {
             if (cellInputColor === "green") {
                 return (
                     <td contentEditable={true} suppressContentEditableWarning={true} style={styles.filledCell}
+                        id={props.column.code + '_' + props.rowNum}
                         onBlur={(e) =>
-                            oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
+                            oninputCell(props.column.code, props.rowCode, "input", e, props.value)}
+                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}>{props.value}</td>
                 )
             } else if (cellInputColor === "red") {
                 return (
                     <td contentEditable={true} suppressContentEditableWarning={true} style={styles.emptyCell}
+                        id={props.column.code + '_' + props.rowNum}
                         onBlur={(e) =>
-                            oninputCell(props.column.code, props.rowCode, "input", e)}>{props.value}</td>
+                            oninputCell(props.column.code, props.rowCode, "input", e, props.value)}
+                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}>{props.value}</td>
                 )
             }
 
@@ -193,7 +236,7 @@ export default function TableCell(props) {
                     <td contentEditable={false} className="center align-middle" style={styles.defaultCell}>
                         <FormCheck defaultChecked={props.value}
                                    onInput={(e) =>
-                                       oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+                                       oninputCell(props.column.code, props.rowCode, "checkbox", e, props.value)}/>
                     </td>
                 )
             } else if (cellCheckboxColor === "yellow") {
@@ -201,7 +244,7 @@ export default function TableCell(props) {
                     <td contentEditable={false} className="center align-middle" style={styles.changedCheckbox}>
                         <FormCheck defaultChecked={props.value}
                                    onInput={(e) =>
-                                       oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+                                       oninputCell(props.column.code, props.rowCode, "checkbox", e, props.value)}/>
                     </td>
                 )
             }

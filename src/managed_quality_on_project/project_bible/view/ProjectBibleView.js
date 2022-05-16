@@ -27,6 +27,7 @@ export default function ProjectBibleView(props) {
     const [isLoaded, setIsLoaded] = useState(false)
     const [actionColumn, setActionColumn] = useState(true)
     const [progressPercent, setProgressPercent] = useState(0)
+    const [clientViewManagerName, setClientViewManagerName] = useState("")
 
     const queryStringParams = queryString.parse(window.location.search)
     const clientName = queryStringParams.client_name
@@ -743,6 +744,9 @@ export default function ProjectBibleView(props) {
     }
 
     async function createClientView() {
+        console.log('Отправленное имя: ' + clientViewManagerName);
+
+        if (clientViewManagerName) {
         await fetch("/proxy/project_bible_template/projectBibleClientViewGenerateIndividualCode", {
             method: 'GET',
         })
@@ -764,7 +768,8 @@ export default function ProjectBibleView(props) {
                                 "projectCode": projectCode,
                                 "code": resultGenerate.individualCode,
                                 "columns": columnsForClientView,
-                                "rows": rowsForClientView
+                                "rows": rowsForClientView,
+                                "manager": clientViewManagerName
                             }),
                         })
                             .then(res => res.json())
@@ -779,10 +784,17 @@ export default function ProjectBibleView(props) {
 
                                     setClientViewsList(
                                         clientViewsList.map(info => {
+                                            console.log("DATE", new Date().toJSON())
+
                                             info.data.push({
                                                 code: resultGenerate.individualCode,
                                                 submit: false,
-                                                date: new Date().toJSON().slice(0,10).replace(/-/g,'-')
+                                                date: new Date().toJSON().slice(0,10).replace(/-/g,'-'),
+                                                time: new Date().toLocaleTimeString('en-US', { hour12: false,
+                                                    hour: "numeric",
+                                                    minute: "numeric",
+                                                    second: "numeric"}),
+                                                manager: clientViewManagerName
                                             })
 
                                             return info
@@ -801,6 +813,9 @@ export default function ProjectBibleView(props) {
                     //todo придумать какой-то текст ошибки
                 }
             )
+        } else {
+            alert("Please fill manager name field at first")
+        }
     }
 
     function createColumnsArrayForClientView() {
@@ -874,7 +889,9 @@ export default function ProjectBibleView(props) {
                                 info.data.push({
                                     code: value.code,
                                     submit: value.submit,
-                                    date: correctDate.toISOString().split('T')[0]
+                                    date: correctDate.toISOString().split('T')[0],
+                                    time: value.time_create.substr(0, 8),
+                                    manager: value["created_by_manager"]
                                 })
 
                                 return info
@@ -1068,10 +1085,6 @@ export default function ProjectBibleView(props) {
                 <br />
                 <div className="row">
                     <div className="col-sm-12 center">
-                        <Button variant="dark" onClick={(e) => createClientView()}>
-                            Создать страницу для клиента&nbsp;&nbsp;<FontAwesomeIcon icon={faUserTie} />
-                        </Button>
-                        &nbsp;&nbsp;
                         <Button variant="success" onClick={(e) => createExcel()}>
                             Выгрузить excel&nbsp;&nbsp;<FontAwesomeIcon icon={faFileExcel}/>
                         </Button>
@@ -1079,6 +1092,26 @@ export default function ProjectBibleView(props) {
                 </div>
                 <br />
                 <br />
+                <br />
+                <div className="row">
+                    <div className="col-sm-4">
+                        <Form>
+                            <Form.Group className="mb-3" controlId="fxorManagerName">
+                                <Form.Label>Имя менеджера</Form.Label>
+                                <Form.Control onChange={e =>
+                                    setClientViewManagerName(e.target.value)} />
+                            </Form.Group>
+                        </Form>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-sm-4 center">
+                        <Button className="center" variant="dark"
+                                onClick={(e) => createClientView()}>
+                            Создать страницу для клиента&nbsp;&nbsp;<FontAwesomeIcon icon={faUserTie} />
+                        </Button>
+                    </div>
+                </div>
                 <br />
                 <div className="row">
                     <div className="col-sm-12 center">

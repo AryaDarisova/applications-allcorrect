@@ -517,10 +517,10 @@ class ProjectBibleTemplateController {
     }
 
     async setProjectBibleClientViewInsert(req, res) {
-        const {clientName, projectName, projectCode, code, columns, rows} = req.body
+        const {clientName, projectName, projectCode, code, columns, rows, manager} = req.body
         const queryResult = await db.query(
-            'INSERT INTO project_bible_client_view (client_name, project_name, project_code, code, columns, rows) VALUES ($1, $2, $3, $4, $5, $6)',
-            [clientName, projectName, projectCode, code, JSON.stringify(columns), JSON.stringify(rows)]
+            'INSERT INTO project_bible_client_view (client_name, project_name, project_code, code, columns, rows, created_by_manager) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [clientName, projectName, projectCode, code, JSON.stringify(columns), JSON.stringify(rows), manager]
         )
 
         res.json(queryResult)
@@ -529,7 +529,7 @@ class ProjectBibleTemplateController {
     async getProjectBibleClientView(req, res) {
         const {clientName, projectName, projectCode} = req.body
         const value = await db.query(
-            'SELECT code, columns, rows, date_create, submit FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
+            'SELECT code, columns, rows, date_create, submit, time_create, created_by_manager FROM project_bible_client_view WHERE client_name = $1 AND project_name = $2 AND project_code = $3',
             [clientName, projectName, projectCode]
         )
 

@@ -34,6 +34,7 @@ const styles = {
 
 export default function TableInfo(props) {
     console.log("props.columns, props.rows", props.columns, props.rows)
+    let rowNum = 0
 
     return (
         <Table className="resizableTable" responsive bordered style={styles.tableFixHeadTable} >
@@ -84,16 +85,17 @@ export default function TableInfo(props) {
                     return info
                 })*/
 
-                props.rows.map((row, rowIndex, rowNum = 1) => {
+                props.rows.map((row, rowIndex) => {
 
                     if (row.show) {
+                        console.log("ROW_NUM", rowNum)
+                        rowNum++
+
                         return (
                             <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns}
                                       moveUpRow={props.moveUpRow} moveDownRow={props.moveDownRow}
                                       actionColumn={props.actionColumn} rowNum={rowNum} />
                         )
-
-                        rowNum++
                     }
                 })
             }
