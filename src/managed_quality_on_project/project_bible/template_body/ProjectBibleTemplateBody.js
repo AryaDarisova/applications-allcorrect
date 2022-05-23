@@ -31,7 +31,7 @@ export default function ProjectBibleTemplateHeader(props) {
     let cellOnCount = 0
 
     async function addRowToTheEnd() {
-        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateIndividualCode", {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateRowIndividualCode", {
             method: 'GET',
         })
             .then(res => res.json())

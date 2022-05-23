@@ -130,24 +130,28 @@ class ProjectBibleTemplateController {
 
     //Запросы к таблице project_bible_template_tags
     async getProjectBibleTemplateTags(req, res) {
+        const groups = await db.query(
+            'SELECT code, name FROM project_bible_template_tag_groups WHERE active = true ORDER BY num'
+        )
+
         const tags = await db.query(
             'SELECT * FROM project_bible_template_tags ORDER BY tag_group, value'
         )
 
-        res.json({"tags": tags.rows})
+        res.json({"tag_groups": groups.rows, "tags": tags.rows})
     }
 
     async setProjectBibleTemplateTagsUpdateGroupTag(req, res) {
-        const {oldTitle, newTitle} = req.body
+        const {groupCode, newTitle} = req.body
         const queryUpdateGroupTag = await db.query(
-            'UPDATE project_bible_template_tags SET tag_group = $2 WHERE tag_group = $1',
-            [oldTitle, newTitle]
+            'UPDATE project_bible_template_tag_groups SET name = $2 WHERE code = $1',
+            [groupCode, newTitle]
         )
 
         res.json(queryUpdateGroupTag)
     }
 
-    async setProjectBibleTemplateTagsCheckExistBeforeUpdateTag(req, res) {
+    /*async setProjectBibleTemplateTagsCheckExistBeforeUpdateTag(req, res) {
         const {group, oldTitle} = req.body
         const queryExist = await db.query(
             'SELECT * FROM project_bible_template_tags WHERE tag_group = $1 AND value = $2',
@@ -155,46 +159,92 @@ class ProjectBibleTemplateController {
         )
 
         res.json(queryExist.rows)
-    }
+    }*/
 
     async setProjectBibleTemplateTagsAddTag(req, res) {
-        const {group, oldTitle, newTitle} = req.body
+        const {groupCode, tagCode} = req.body
         const queryAddTag = await db.query(
-            'INSERT INTO project_bible_template_tags (tag_group, value) VALUES ($1, $2)',
-            [group, newTitle]
+            'INSERT INTO project_bible_template_tags (tag_group, tag_code) VALUES ($1, $2)',
+            [groupCode, tagCode]
+        )
+
+        res.json(queryAddTag)
+    }
+
+    async setProjectBibleTemplateTagsAddGroupTag(req, res) {
+        const {num, code, active} = req.body
+        const queryAddTag = await db.query(
+            'INSERT INTO project_bible_template_tag_groups (num, code, active) VALUES ($1, $2, $3)',
+            [num, code, active]
         )
 
         res.json(queryAddTag)
     }
 
     async setProjectBibleTemplateTagsUpdateTag(req, res) {
-        const {group, oldTitle, newTitle} = req.body
+        const {tagCode, newTitle} = req.body
         const queryUpdateTag = await db.query(
-            'UPDATE project_bible_template_tags SET value = $3 WHERE tag_group = $1 AND value = $2',
-            [group, oldTitle, newTitle]
+            'UPDATE project_bible_template_tags SET value = $2 WHERE tag_code = $1',
+            [tagCode, newTitle]
         )
 
         res.json(queryUpdateTag)
     }
 
     async setProjectBibleTemplateTagsDeleteGroupTag(req, res) {
-        const {group} = req.body
+        const {code} = req.body
         const queryDeleteGroupTag = await db.query(
-            'DELETE FROM project_bible_template_tags WHERE tag_group = $1',
-            [group]
+            'UPDATE project_bible_template_tag_groups SET active = false WHERE code = $1',
+            [code]
         )
 
         res.json(queryDeleteGroupTag)
     }
 
     async setProjectBibleTemplateTagsDeleteTag(req, res) {
-        const {group, value} = req.body
+        const {tagCode} = req.body
         const queryDeleteTag = await db.query(
-            'DELETE FROM project_bible_template_tags WHERE tag_group = $1 AND value = $2',
-            [group, value]
+            'DELETE FROM project_bible_template_tags WHERE tag_code = $1',
+            [tagCode]
         )
 
         res.json(queryDeleteTag)
+    }
+
+    async projectBibleTemplateGenerateTagGroupIndividualCode(req, res) {
+        let abc = "abcdefghijklmnopqrstuvwxyz1234567890-";
+        let individualCode = "";
+
+        while (individualCode.length < 36) {
+            individualCode += abc[Math.floor(Math.random() * abc.length)];
+        }
+
+        const exist = await db.query('SELECT * FROM project_bible_template_tag_groups WHERE code = $1', [individualCode])
+
+        res.json({"individualCode": individualCode, "exist": exist.rows})
+    }
+
+    async projectBibleTemplateGenerateTagIndividualCode(req, res) {
+        let abc = "abcdefghijklmnopqrstuvwxyz1234567890-";
+        let individualCode = "";
+
+        while (individualCode.length < 36) {
+            individualCode += abc[Math.floor(Math.random() * abc.length)];
+        }
+
+        const exist = await db.query('SELECT * FROM project_bible_template_tags WHERE tag_code = $1', [individualCode])
+
+        res.json({"individualCode": individualCode, "exist": exist.rows})
+    }
+
+    async setProjectBibleTemplateDecNumPredDeleteTagGroup(req, res) {
+        const {initNum} = req.body
+        const queryDecFollowingNum = await db.query(
+            'UPDATE project_bible_template_tag_groups SET num = num - 1 WHERE num > $1',
+            [initNum]
+        )
+
+        res.json(queryDecFollowingNum)
     }
 
     //Запросы к таблице project_bible_template && project_bible_template_rows

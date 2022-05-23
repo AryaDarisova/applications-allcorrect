@@ -13,133 +13,38 @@ export default function ProjectBibleTemplateTags(props) {
     }])
 
     async function addTagGroup() {
-        setTags(
-            tags.map(info => {
-                info.data[""] = {"title": "", "data": []}
+        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateTagGroupIndividualCode", {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(
+                async (resultGenerate) => {
+                    console.log("resultGenerate", resultGenerate)
 
-                return info
-            })
-        )
-    }
-
-    async function addTag(group) {
-        if (group === "") {
-            alert("Для начала введите название группы тегов.")
-        } else {
-            setTags(
-                tags.map(info => {
-                    info.data[group].data.push("")
-
-                    return info
-                })
-            )
-        }
-    }
-
-    async function updateGroupTagTitle(oldTitle, newTitle) {
-        if (newTitle !== "") {
-            await fetch("/proxy/project_bible_template/projectBibleTemplateTagsUpdateGroupTag", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "oldTitle": oldTitle,
-                    "newTitle": newTitle
-                })
-            })
-                .then(res => res.json())
-                .then(
-                    async (resultUpdate) => {
-                        let newData = [];
-
-                        for (var key in tags[0].data) {
-                            if (key !== oldTitle) {
-                                newData[key] = tags[0].data[key]
-                            } else {
-                                // newData[newTitle] = tags[0].data[key]
-                                newData[newTitle] = {"title": newTitle, "data": []}
-
-                                for (let i = 0; i < tags[0].data[key].data.length; i++) {
-                                    newData[newTitle].data.push(tags[0].data[key].data[i]);
-                                }
-                            }
-                        }
-
-                        setTags(
-                            tags.map(info => {
-                                console.log("newData after Update group title", newData)
-                                info.data = newData
-
-                                return info
-                            })
-                        )
-                    },
-                    (error) => {
-                        //todo придумать какой-то текст ошибки
-                    }
-                )
-        } else {
-            alert("Вы оставили поле названия группы тегов пустым - заполните его.")
-        }
-    }
-
-    async function updateTagTitle(group, oldTitle, newTitle) {
-        if (newTitle === "") {
-            alert("Заполните поле названия тега.")
-        } else {
-            await fetch("/proxy/project_bible_template/projectBibleTemplateTagsCheckExistBeforeUpdateTag", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "group": group,
-                    "oldTitle": oldTitle
-                })
-            })
-                .then(res => res.json())
-                .then(
-                    async (resultExist) => {
-                        let link = "/proxy/project_bible_template"
-
-                        if (resultExist.length > 0) {
-                            link += "/projectBibleTemplateTagsUpdateTag"
-                        } else {
-                            link += "/projectBibleTemplateTagsAddTag"
-                        }
-
-                        await fetch(link, {
+                    if (!resultGenerate.exist.length) {
+                        await fetch("/proxy/project_bible_template/projectBibleTemplateTagsAddGroupTag", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                "group": group,
-                                "oldTitle": oldTitle,
-                                "newTitle": newTitle
+                                "num": Object.keys(tags[0].data).length + 1,
+                                "code": resultGenerate.individualCode,
+                                "active": true
                             })
                         })
                             .then(res => res.json())
                             .then(
-                                async (resultUpdate) => {
-                                    if (group === "") {
-                                        alert("Не забудьте заполнить название группы тегов.");
-                                    }
-
-                                    let indexForDelete = 0;
-
-                                    for (let i = 0; i < tags[0].data[group].data.length; i++) {
-                                        if (tags[0].data[group].data[i] === oldTitle) {
-                                            break;
-                                        }
-
-                                        indexForDelete++;
-                                    }
-
+                                (resultAdd) => {
                                     setTags(
                                         tags.map(info => {
-                                            info.data[group].data.splice(indexForDelete, 1, newTitle)
+                                            info.data[resultGenerate.individualCode] = {
+                                                "code": resultGenerate.individualCode,
+                                                "title": "",
+                                                "data": []
+                                            }
+
+                                            console.log("addTagGroup", tags)
 
                                             return info
                                         })
@@ -149,6 +54,98 @@ export default function ProjectBibleTemplateTags(props) {
                                     //todo придумать какой-то текст ошибки
                                 }
                             )
+                    } else {
+                        addTagGroup()
+                    }
+                },
+                (error) => {
+                    //todo придумать какой-то текст ошибки
+                }
+            )
+    }
+
+    async function addTag(groupCode) {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateGenerateTagIndividualCode", {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(
+                async (resultGenerate) => {
+                    if (!resultGenerate.exist.length) {
+                        await fetch("/proxy/project_bible_template/projectBibleTemplateTagsAddTag", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "groupCode": groupCode,
+                                "tagCode": resultGenerate.individualCode
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(
+                                (resultAdd) => {
+                                    setTags(
+                                        tags.map(info => {
+                                            info.data[groupCode].data[resultGenerate.individualCode] = ""
+
+                                            return info
+                                        })
+                                    )
+                                },
+                                (error) => {
+                                    //todo придумать какой-то текст ошибки
+                                }
+                            )
+                    } else {
+                        addTag(groupCode)
+                    }
+                },
+                (error) => {
+                    //todo придумать какой-то текст ошибки
+                }
+            )
+    }
+
+    async function updateGroupTagTitle(groupCode, newTitle) {
+        if (newTitle !== "") {
+            await fetch("/proxy/project_bible_template/projectBibleTemplateTagsUpdateGroupTag", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "groupCode": groupCode,
+                    "newTitle": newTitle
+                })
+            })
+                .then(res => res.json())
+                .then(
+                    async (resultUpdate) => {
+                        let newData = [];
+
+                        for (let key in tags[0].data) {
+                            if (key !== groupCode) {
+                                newData[key] = tags[0].data[key]
+                            } else {
+                                newData[key] = {"code": groupCode, "title": newTitle, "data": []}
+
+                                for (let i = 0; i < tags[0].data[key].data.length; i++) {
+                                    newData[key].data.push(tags[0].data[key].data[i]);
+                                }
+                            }
+                        }
+
+                        setTags(
+                            tags.map(info => {
+                                console.log("newData after Update group title", newData)
+                                info.data = newData
+
+                                console.log("updateGroupTagTitle", tags)
+
+                                return info
+                            })
+                        )
                     },
                     (error) => {
                         //todo придумать какой-то текст ошибки
@@ -157,30 +154,23 @@ export default function ProjectBibleTemplateTags(props) {
         }
     }
 
-    async function deleteGroupTag(group) {
-        await fetch("/proxy/project_bible_template/projectBibleTemplateTagsDeleteGroupTag", {
+    async function updateTagTitle(groupCode, tagCode, newTitle) {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateTagsUpdateTag", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "group": group
+                "tagCode": tagCode,
+                "newTitle": newTitle
             })
         })
             .then(res => res.json())
             .then(
-                async (resultDelete) => {
-                    let newData = [];
-
-                    for (var key in tags[0].data) {
-                        if (key !== group) {
-                            newData[key] = tags[0].data[key]
-                        }
-                    }
-
+                async (resultUpdate) => {
                     setTags(
                         tags.map(info => {
-                            info.data = newData
+                            info.data[groupCode].data[tagCode] = newTitle
 
                             return info
                         })
@@ -190,45 +180,98 @@ export default function ProjectBibleTemplateTags(props) {
                     //todo придумать какой-то текст ошибки
                 }
             )
-
     }
 
-    async function deleteTag(group, value) {
+    async function deleteGroupTag(group, num) {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateDecNumPredDeleteTagGroup", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "initNum": num
+            })
+        })
+            .then(res => res.json())
+            .then(
+                async (resultPredDelete) => {
+                    await fetch("/proxy/project_bible_template/projectBibleTemplateTagsDeleteGroupTag", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            "code": group
+                        })
+                    })
+                        .then(res => res.json())
+                        .then(
+                            async (resultDelete) => {
+                                let newData = [];
+
+                                for (let key in tags[0].data) {
+                                    if (key !== group) {
+                                        newData[key] = tags[0].data[key]
+                                    }
+                                }
+
+                                setTags(
+                                    tags.map(info => {
+                                        info.data = newData
+                                        console.log("deleteGroupTag", tags)
+
+                                        return info
+                                    })
+                                )
+                            },
+                            (error) => {
+                                //todo придумать какой-то текст ошибки
+                            }
+                        )
+                },
+                (error) => {
+                    //todo придумать какой-то текст ошибки
+                }
+            )
+    }
+
+    async function deleteTag(groupCode, tagCode) {
         await fetch("/proxy/project_bible_template/projectBibleTemplateTagsDeleteTag", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                "group": group,
-                "value": value
+                "tagCode": tagCode
             })
         })
             .then(res => res.json())
             .then(
                 async (resultDelete) => {
-                    let indexForDelete = 0;
-
-                    for (let i = 0; i < tags[0].data[group].data.length; i++) {
-                        if (tags[0].data[group].data[i] === value) {
-                            break;
-                        }
-
-                        indexForDelete++;
-                    }
-
-                    setTags(
-                        tags.map(info => {
-                            info.data[group].data.splice(indexForDelete, 1)
-
-                            return info
-                        })
-                    )
+                    deleteTagElementFromArray(groupCode, tagCode)
                 },
                 (error) => {
                     //todo придумать какой-то текст ошибки
                 }
             )
+    }
+
+    function deleteTagElementFromArray(groupCode, tagCode) {
+        let newData = [];
+
+        for (let key in tags[0].data[groupCode].data) {
+            if (key !== tagCode) {
+                newData[key] = tags[0].data[groupCode].data[key]
+            }
+        }
+
+        setTags(
+            tags.map(info => {
+                info.data[groupCode].data = newData
+
+                return info
+            })
+        )
     }
 
     useEffect(async () => {
@@ -242,14 +285,20 @@ export default function ProjectBibleTemplateTags(props) {
                         tags.map(info => {
                             let resultData = []
 
+                            result.tag_groups.map(value => {
+                                let groupCode = value.code
+                                let groupTitle = value.name
+
+                                resultData[groupCode] = {"code": groupCode, "title": groupTitle, "data": []}
+                            })
+
                             result.tags.map(value => {
-                                let groupTitle = value.tag_group
+                                let groupCode = value["tag_group"]
+                                let tagCode = value["tag_code"]
 
-                                if (typeof resultData[groupTitle] === 'undefined') {
-                                    resultData[groupTitle] = {"title": groupTitle, "data": []}
+                                if (typeof resultData[groupCode] !== 'undefined') {
+                                    resultData[groupCode].data[tagCode] = value.value
                                 }
-
-                                resultData[groupTitle].data.push(value.value)
                             })
 
                             info.data = resultData
@@ -269,14 +318,16 @@ export default function ProjectBibleTemplateTags(props) {
 
     const getTagTables = tags => {
         let content = []
+        let index = 0
 
-        for (var key in tags[0].data) {
+        for (let key in tags[0].data) {
             let value = tags[0].data[key]
 
-            content.push(<TagGroupTable key={value.title} title={value.title} data={value.data}
+            content.push(<TagGroupTable key={value.code} code={value.code} title={value.title} data={value.data}
                                         updateGroupTagTitle={updateGroupTagTitle} addTag={addTag}
                                         updateTagTitle={updateTagTitle} deleteTag={deleteTag}
-                                        deleteGroupTag={deleteGroupTag}/>)
+                                        deleteGroupTag={deleteGroupTag} groupIndex={index} />)
+            index++
         }
 
         return content
@@ -306,9 +357,7 @@ export default function ProjectBibleTemplateTags(props) {
                 <br />
                 <div className="managedQualityOnProjectBlockView">
                     <div className="row">
-                        {/*<div className="col-sm-12">*/}
-                            { getTagTables(tags) }
-                        {/*</div>*/}
+                        { getTagTables(tags) }
                     </div>
                     <br />
                     <div className="row">

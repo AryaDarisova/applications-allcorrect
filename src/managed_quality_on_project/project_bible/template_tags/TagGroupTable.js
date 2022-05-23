@@ -15,6 +15,31 @@ const styles = {
 }
 
 export default function TagGroupTable(props) {
+    const getTags = tags => {
+        let content = []
+
+        for (let key in tags) {
+            let value = tags[key]
+
+            content.push(
+                <tr key={key}>
+                    <td>
+                        <FormControl placeholder="Название тега" defaultValue={value}
+                                     onBlur={(e) =>
+                                         props.updateTagTitle(props.code, key, e.target.value)}/>
+                    </td>
+                    <td className="center">
+                        <Button size="sm" variant="danger" onClick={(e) =>
+                            props.deleteTag(props.code, key)}>
+                            <FontAwesomeIcon icon={faTimes} /></Button>
+                    </td>
+                </tr>
+            )
+        }
+
+        return content
+    };
+
     return (
         <div className="col-sm-4">
             <Table responsive bordered>
@@ -23,7 +48,7 @@ export default function TagGroupTable(props) {
                     <th colSpan="2">
                         <FormControl placeholder="Название группы тегов" defaultValue={props.title}
                                      onBlur={(e) =>
-                                         props.updateGroupTagTitle(props.title, e.target.value)}/>
+                                         props.updateGroupTagTitle(props.code, e.target.value)}/>
                     </th>
                 </tr>
                 <tr>
@@ -32,34 +57,35 @@ export default function TagGroupTable(props) {
                 </tr>
                 </thead>
                 <tbody>
-                {
-                    props.data.map(value => {
+                { getTags(props.data) }
+                {/*{
+                    props.data.map((value, index) => {
                         return(
-                            <tr key={value}>
+                            <tr key={value/*props.code + "_" + index*!/>
                                 <td>
                                     <FormControl placeholder="Название тега" defaultValue={value}
                                                  onBlur={(e) =>
-                                                     props.updateTagTitle(props.title, value, e.target.value)}/>
+                                                     props.updateTagTitle(props.code, value, e.target.value, index)}/>
                                 </td>
                                 <td className="center">
                                     <Button size="sm" variant="danger" onClick={(e) =>
-                                        props.deleteTag(props.title, value)}>
+                                        props.deleteTag(props.code, value, index)}>
                                         <FontAwesomeIcon icon={faTimes} /></Button>
                                 </td>
                             </tr>
                         )
                     })
-                }
+                }*/}
                 </tbody>
             </Table>
             <br />
             <div  className="center">
                 <Button size="sm" variant="success" onClick={(e) =>
-                    props.addTag(props.title)}>Добавить тег&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} />
+                    props.addTag(props.code)}>Добавить тег&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} />
                 </Button>
                 &nbsp;
                 <Button size="sm" variant="danger" onClick={(e) =>
-                    props.deleteGroupTag(props.title)}>Удалить группу тегов&nbsp;<FontAwesomeIcon icon={faTimes} />
+                    props.deleteGroupTag(props.code, props.groupIndex)}>Удалить группу тегов&nbsp;<FontAwesomeIcon icon={faTimes} />
                 </Button>
             </div>
             <br />

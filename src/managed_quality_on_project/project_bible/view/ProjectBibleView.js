@@ -221,7 +221,7 @@ export default function ProjectBibleView(props) {
                             .then(res => res.json())
                             .then(
                                 async (resultTemplate) => {
-                                    // console.log("projectBibleTemplateRowsColumns result", resultTemplate.columns, resultTemplate.rows)
+                                    console.log("projectBibleTemplateRowsColumns result", resultTemplate.columns, resultTemplate.rows)
 
                                     await fetch("/proxy/project_bible_template/projectBibleInfoInsert", {
                                         method: 'POST',
@@ -275,7 +275,8 @@ export default function ProjectBibleView(props) {
                                                             info.data.push({
                                                                 "code": value.code,
                                                                 "show": true,
-                                                                "data": []
+                                                                "data": [],
+                                                                "template": []
                                                             });
 
                                                             return info

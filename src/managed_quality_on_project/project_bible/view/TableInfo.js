@@ -55,7 +55,7 @@ export default function TableInfo(props) {
                 }
                 {
                     props.actionColumn &&
-                    <ColumnResizer className="columnResizer"/>
+                    <ColumnResizer key="ActionColumnResizer" className="columnResizer"/>
                 }
                 {
                     props.actionColumn &&
@@ -86,9 +86,7 @@ export default function TableInfo(props) {
                 })*/
 
                 props.rows.map((row, rowIndex) => {
-
                     if (row.show) {
-                        console.log("ROW_NUM", rowNum)
                         rowNum++
 
                         return (
