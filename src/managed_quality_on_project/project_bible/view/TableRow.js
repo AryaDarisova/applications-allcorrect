@@ -28,7 +28,8 @@ export default function TableRow(props) {
                                 <TableCell key={props.row.code + "_" + column.code} editable={column.editable}
                                            template={column.template} type={column.type} column={column}
                                            rowCode={props.row.code} value={props.row.data[column.code]}
-                                           columnIndex={columnIndex} row={props.row} rowNum={props.rowNum}  />
+                                           columnIndex={columnIndex} row={props.row} rowNum={props.rowNum}
+                                           setInputRegexModalValue={props.setInputRegexModalValue} />
                             </>
                         )
                     }

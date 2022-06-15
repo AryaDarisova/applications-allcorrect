@@ -54,6 +54,12 @@ router.post('/projectBibleTemplateBoolByNameIfExist', projectBibleTemplateContro
 router.post('/projectBibleTemplateOninputUpdateBoolCell', projectBibleTemplateController.setProjectBibleTemplateOninputUpdateBoolCell)
 router.post('/projectBibleTemplateOninputInsertBoolCell', projectBibleTemplateController.setProjectBibleTemplateOninputInsertBoolCell)
 
+//Запросы к таблице project_bible_template_json
+router.post('/projectBibleTemplateTagJsonByName', projectBibleTemplateController.getProjectBibleTagJsonTemplateValue)
+router.post('/projectBibleTemplateTagJsonByNameIfExist', projectBibleTemplateController.getProjectBibleTagJsonTemplateIfExistValue)
+router.post('/projectBibleTemplateUpdateTagJsonCell', projectBibleTemplateController.setProjectBibleTemplateUpdateTagJsonCell)
+router.post('/projectBibleTemplateInsertTagJsonCell', projectBibleTemplateController.setProjectBibleTemplateInsertTagJsonCell)
+
 //Запросы к таблице project_bible_info
 router.post('/projectBibleInfo', projectBibleTemplateController.getProjectBibleInfo)
 router.post('/projectBibleInfoInsert', projectBibleTemplateController.setProjectBibleInfoInsert)

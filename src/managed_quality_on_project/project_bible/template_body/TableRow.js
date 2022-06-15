@@ -19,7 +19,8 @@ export default function TableRow(props) {
                     return(
                         <TableCell key={props.row.code + "_" + column.code}
                                    type={column.type} column={column} rowCode={props.row.code}
-                                   value={props.row.data[column.code]} columnIndex={columnIndex} />
+                                   value={props.row.data[column.code]} columnIndex={columnIndex}
+                                   setTagValue={props.setTagValue} />
                     )
                 })
             }

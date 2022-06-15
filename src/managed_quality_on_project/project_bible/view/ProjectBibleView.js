@@ -8,6 +8,7 @@ import "../css/tableFixHeader.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFilePdf, faFilter, faUserTie, faFileExcel} from "@fortawesome/free-solid-svg-icons";
 import XLSX from "xlsx";
+import SaveInputRegexModal from "./SaveInputRegexModal";
 
 const styles = {
     blockView: {
@@ -28,6 +29,14 @@ export default function ProjectBibleView(props) {
     const [actionColumn, setActionColumn] = useState(true)
     const [progressPercent, setProgressPercent] = useState(0)
     const [clientViewManagerName, setClientViewManagerName] = useState("")
+    const [saveInputRegexModalActive, setSaveInputRegexModalActive] = useState(false);
+    const [saveInputRegexModalData, setSaveInputRegexModalData] = useState([{
+        links: [],
+        value: '',
+        oldValue: '',
+        row: '',
+        column: ''
+    }])
 
     const queryStringParams = queryString.parse(window.location.search)
     const clientName = queryStringParams.client_name
@@ -326,6 +335,9 @@ export default function ProjectBibleView(props) {
                             // queryLinkTemplate += 'projectBibleTemplateBoolByName'
                             queryLinkTemplate += 'projectBibleTemplateBoolByNameIfExist'
                             queryLinkEditable += 'projectBibleFilledCellBoolByName'
+                        } else if (column.type === "tags_list") {
+                            queryLinkTemplate += 'projectBibleTemplateTagJsonByNameIfExist'
+                            queryLinkEditable += 'projectBibleFilledCellBoolByName'
                         }
 
                         if (column.template && column.editable) {
@@ -457,6 +469,8 @@ export default function ProjectBibleView(props) {
                                             row.data[column.code] = ""
                                         } else if (column.type === "checkbox") {
                                             row.data[column.code] = false
+                                        } else if (column.type === "tags_list") {
+                                            row.data[column.code] = []
                                         }
 
                                         cellOnCount++
@@ -695,7 +709,7 @@ export default function ProjectBibleView(props) {
     }
 
     function filterFindCheckboxRowsToRemove(code, showFilledCells) {
-        console.log("filterFindCheckboxRowsToRemove", rows)
+        // console.log("filterFindCheckboxRowsToRemove", rows)
 
         setRows(
             rows.map(info => {
@@ -1005,6 +1019,229 @@ export default function ProjectBibleView(props) {
         return data
     }
 
+    function setInputRegexModalValue(active, column, row, value, oldValue) {
+        setSaveInputRegexModalActive(active)
+
+        /*let regexLink = /https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,}/g;
+        let regexTagLink = /(<a[^>]*?href=\"((https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,}))\">(.*?)<\/a>)/g;
+        let regexExtraTags = /">.*?<\/a>/g;
+        let linkArray = value.match(regexLink) || []
+        let tagLinkArray = value.match(regexTagLink) || []
+        let associativeLinks = []*/
+
+        /*for (let i = 0; i < linkArray.length; i++) {
+            let indexCoincidence = linkArray[i].search(regexExtraTags)
+
+            if(indexCoincidence !== -1) {
+                linkArray[i] = linkArray[i].slice(0, indexCoincidence)
+            }
+
+            associativeLinks[linkArray[i]] = {
+                "link": linkArray[i],
+                "title": "",
+                "tagExist": ""
+            }
+        }*/
+
+        /*for (let i = 0; i < tagLinkArray.length; i++) {
+            let regexLinkTitle = /<a[^>]*?href=\"(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})\">(.*?)<\/a>/;
+            let link =  tagLinkArray[i].match(regexLink)
+            let linkTitle =  tagLinkArray[i].match(regexLinkTitle)[2]
+            let indexCoincidence = link[0].search(regexExtraTags)
+
+            if(indexCoincidence !== -1) {
+                link[0] = link[0].slice(0, indexCoincidence)
+            }
+
+            associativeLinks[link[0]].tagExist = tagLinkArray[i]
+            associativeLinks[link[0]].title = linkTitle
+        }*/
+
+        setSaveInputRegexModalData(
+            saveInputRegexModalData.map(info => {
+                let regexLink = /https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,}/g;
+                let regexTagLink = /(<a[^>]*?href=\"((https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,}))\">(.*?)<\/a>)/g;
+                let regexExtraTags = /">.*?<\/a>/g;
+                let linkArray = value.match(regexLink) || []
+                let tagLinkArray = value.match(regexTagLink) || []
+                let associativeLinks = []
+
+                for (let i = 0; i < linkArray.length; i++) {
+                    let indexCoincidence = linkArray[i].search(regexExtraTags)
+
+                    if (indexCoincidence !== -1) {
+                        linkArray[i] = linkArray[i].slice(0, indexCoincidence)
+                    }
+
+                    associativeLinks[linkArray[i]] = {
+                        "link": linkArray[i],
+                        "title": "",
+                        "tagExist": ""
+                    }
+                }
+
+                for (let i = 0; i < tagLinkArray.length; i++) {
+                    let regexLinkTitle = /<a[^>]*?href=\"(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})\">(.*?)<\/a>/;
+                    let link =  tagLinkArray[i].match(regexLink)
+                    let linkTitle =  tagLinkArray[i].match(regexLinkTitle)[2]
+                    let indexCoincidence = link[0].search(regexExtraTags)
+
+                    if (indexCoincidence !== -1) {
+                        link[0] = link[0].slice(0, indexCoincidence)
+                    }
+
+                    associativeLinks[link[0]].tagExist = tagLinkArray[i]
+                    associativeLinks[link[0]].title = linkTitle
+                }
+
+                info.row = row
+                info.column = column
+                info.value = value
+                info.oldValue = oldValue
+                info.links = associativeLinks
+
+                return info
+            })
+        )
+
+        console.log("saveInputRegexModalData", saveInputRegexModalData)
+    }
+    
+    async function saveInputCellWithTag(column, row, value, oldValue) {
+        console.log("NEW VALUE", value)
+
+        if (value !== oldValue) {
+            await fetch('/proxy/project_bible_template/projectBibleFilledCellTextByName', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "clientName": clientName,
+                    "projectName": projectName,
+                    "projectCode": projectCode,
+                    "colCode": column,
+                    "rowCode": row
+                })
+            })
+                .then(res => res.json())
+                .then(
+                    async (resultEditable) => {
+                        console.log("resultEditable", resultEditable)
+
+                        if (resultEditable.length) {
+                            await fetch('/proxy/project_bible_template/projectBibleOninputUpdateTextCell', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    "clientName": clientName,
+                                    "projectName": projectName,
+                                    "projectCode": projectCode,
+                                    "colCode": column,
+                                    "rowCode": row,
+                                    "value": value
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(
+                                    async (resultUpdate) => {
+                                        setRows(rows.map(rowsData => {
+                                            rowsData.data.map(rowValue => {
+                                                console.log("SAVE", rowValue.code, row)
+
+                                                if (rowValue.code === row) {
+                                                    rowValue.data[column] = value
+                                                }
+
+                                                return rowValue
+                                            })
+
+                                            return rowsData
+                                        }))
+
+                                        setSaveInputRegexModalData(
+                                            saveInputRegexModalData.map(info => {
+                                                info.links = []
+
+                                                return info
+                                            })
+                                        )
+
+                                        setSaveInputRegexModalActive(false)
+                                    },
+                                    (error) => {
+                                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                                            "верное значение")
+                                    }
+                                )
+                        } else {
+                            await fetch('/proxy/project_bible_template/projectBibleOninputInsertTextCell', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    "clientName": clientName,
+                                    "projectName": projectName,
+                                    "projectCode": projectCode,
+                                    "colCode": column,
+                                    "rowCode": row,
+                                    "value": value
+                                })
+                            })
+                                .then(res => res.json())
+                                .then(
+                                    async (resultInsert) => {
+                                        setRows(rows.map(rowsData => {
+                                            rowsData.data.map(rowValue => {
+                                                console.log("SAVE", rowValue.code, row, rowValue)
+
+                                                if (rowValue.code === row) {
+                                                    rowValue.data[column] = value
+                                                }
+
+                                                return rowValue
+                                            })
+
+                                            return rowsData
+                                        }))
+
+                                        setSaveInputRegexModalData(
+                                            saveInputRegexModalData.map(info => {
+                                                info.links = []
+
+                                                return info
+                                            })
+                                        )
+
+                                        setSaveInputRegexModalActive(false)
+                                    },
+                                    (error) => {
+                                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                                            "верное значение")
+                                    }
+                                )
+                        }
+                    },
+                    (error) => {
+                        alert("Ошибка при сохранении значения ячейки. Если это была ячейка для ввода " +
+                            "текста, то попробуйте поставить указатель обратно в эту ячейку, а затем убрать " +
+                            "- повторится процедура сохранения. Если это чекбокс - снимите/поставьте " +
+                            "галочку и после этого повторите последнее действие еще раз, чтобы сохранилось " +
+                            "верное значение")
+                    }
+                )
+        }
+    }
+
     if (error) {
         return (
             <div className="row">
@@ -1079,7 +1316,8 @@ export default function ProjectBibleView(props) {
                 <div className="row">
                     <div className="col-sm-12 tableFixHead">
                         {<TableInfo columns={columns[0].data} rows={rows[0].data} moveUpRow={moveUpRow}
-                                    moveDownRow={moveDownRow} actionColumn={actionColumn} />}
+                                    moveDownRow={moveDownRow} actionColumn={actionColumn}
+                                    setInputRegexModalValue={setInputRegexModalValue} />}
                     </div>
                 </div>
                 <br />
@@ -1120,6 +1358,11 @@ export default function ProjectBibleView(props) {
                                         clientViewList={clientViewsList[0].data} deleteClientView={deleteClientView} />
                     </div>
                 </div>
+                <SaveInputRegexModal saveInputRegexModalActive={saveInputRegexModalActive} 
+                                     setSaveInputRegexModalActive={setSaveInputRegexModalActive} 
+                                     saveInputRegexModalData={saveInputRegexModalData} 
+                                     setSaveInputRegexModalData={setSaveInputRegexModalData} 
+                                     saveCell={saveInputCellWithTag} />
             </div>
         )
     }

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Alert, Button, Table} from "react-bootstrap";
 import TableInfo from "../template_body/TableInfo";
+import TagModal from "../template_body/TagModal";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronDown, faChevronUp, faPlus, faTimes} from "@fortawesome/free-solid-svg-icons";
 
@@ -20,6 +21,7 @@ const styles = {
 export default function ProjectBibleTemplateHeader(props) {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isLoadedTagData, setIsLoadedTagData] = useState(false);
     const [columns, setColumns] = useState([{
         data: []
     }])
@@ -27,6 +29,14 @@ export default function ProjectBibleTemplateHeader(props) {
         data: []
     }])
     const [showAlert, setShowAlert] = useState(true)
+    const [tagModalActive, setTagModalActive] = useState(false);
+    const [tagModalData, setTagModalData] = useState([{
+        allTags: [],
+        selectedTags: [],
+        row: '',
+        column: ''
+    }])
+
     let cellAllCount = 0
     let cellOnCount = 0
 
@@ -287,6 +297,7 @@ export default function ProjectBibleTemplateHeader(props) {
             .then(res => res.json())
             .then(
                 async (resultTemplate) => {
+                    //todo убрать отсюда + 1
                     cellAllCount = resultTemplate.columns.length * resultTemplate.rows.length
 
                     resultTemplate.columns.map(value => {
@@ -321,10 +332,11 @@ export default function ProjectBibleTemplateHeader(props) {
                     })
 
                     fillDataForHeaders()
-
+                    fillTagData()
                 },
                 (error) => {
                     setIsLoaded(true);
+                    setIsLoadedTagData(true);
                     setError({
                         message: "Не удалось загрузить данные. Пожалуйста перезагрузите страницу."
                     });
@@ -343,6 +355,8 @@ export default function ProjectBibleTemplateHeader(props) {
                             queryLinkTemplate += 'projectBibleTemplateTextByNameIfExist'
                         } else if (column.type === "checkbox") {
                             queryLinkTemplate += 'projectBibleTemplateBoolByNameIfExist'
+                        } else if (column.type === "tags_list") {
+                            queryLinkTemplate += 'projectBibleTemplateTagJsonByNameIfExist'
                         }
 
                         await fetch(queryLinkTemplate, {
@@ -365,6 +379,8 @@ export default function ProjectBibleTemplateHeader(props) {
                                             row.data[column.code] = ""
                                         } else if (column.type === "checkbox") {
                                             row.data[column.code] = false
+                                        } else if (column.type === "tags_list") {
+                                            row.data[column.code] = []
                                         }
                                     }
 
@@ -376,6 +392,7 @@ export default function ProjectBibleTemplateHeader(props) {
                                 },
                                 (error) => {
                                     setIsLoaded(true);
+                                    setIsLoadedTagData(true);
                                     setError(error);
                                 }
                             )
@@ -389,6 +406,253 @@ export default function ProjectBibleTemplateHeader(props) {
         }))
     }
 
+    async function fillTagData() {
+        await fetch("/proxy/project_bible_template/projectBibleTemplateTags", {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(
+                async (resultTags) => {
+                    setTagModalData(
+                        tagModalData.map(info => {
+                            let resultData = []
+
+                            resultTags.tag_groups.map(value => {
+                                let groupCode = value.code
+                                let groupTitle = value.name
+
+                                resultData[groupCode] = {"code": groupCode, "title": groupTitle, "data": []}
+
+                                return value
+                            })
+
+                            resultTags.tags.map(value => {
+                                let groupCode = value["tag_group"]
+                                let tagCode = value["tag_code"]
+
+                                resultData[groupCode].data[tagCode] = {
+                                    "code": tagCode, "title": value.value
+                                }
+
+                                return value
+                            })
+
+                            info.allTags = resultData
+
+                            return info
+                        })
+                    )
+
+                    setIsLoadedTagData(true)
+                },
+                (error) => {
+                    setIsLoaded(true)
+                    setIsLoadedTagData(true)
+                    setError(error)
+                }
+            )
+    }
+
+    async function setTagValue(val, row, column) {
+        await fetch('/proxy/project_bible_template/projectBibleTemplateTagJsonByNameIfExist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "rowCode": row,
+                "colCode": column,
+            })
+        })
+            .then(res => res.json())
+            .then(
+                async (resultSelectedTags) => {
+                    setTagModalActive(val)
+
+                    setTagModalData(
+                        tagModalData.map(info => {
+                            info.row = row
+                            info.column = column
+
+                            if (resultSelectedTags.length > 0) {
+                                resultSelectedTags[0].value.map(selectTagGroup => {
+                                    info.selectedTags[selectTagGroup.code] = {
+                                        "code": selectTagGroup.code,
+                                        "title": selectTagGroup.title,
+                                        "data": []
+                                    }
+
+                                    selectTagGroup.data.map(selectTag => {
+                                        info.selectedTags[selectTagGroup.code].data[selectTag.code] = selectTag.title
+
+                                        return selectTag
+                                    })
+
+                                    return selectTagGroup
+                                })
+                            } else {
+                                info.selectedTags = []
+                            }
+
+                            return info
+                        })
+                    )
+                },
+                (error) => {
+                    setIsLoaded(true);
+                    setError(error);
+                }
+            )
+    }
+
+    async function saveTagCell(selectedTags) {
+        await fetch('/proxy/project_bible_template/projectBibleTemplateTagJsonByNameIfExist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "colCode": tagModalData[0].column,
+                "rowCode": tagModalData[0].row
+            })
+        })
+            .then(res => res.json())
+            .then(
+                async (resultExist) => {
+                    if (resultExist.length) {
+                        let tempTagGroups = []
+
+                        Object.keys(selectedTags).forEach( (elementGroup) => {
+                            let tempTags = []
+
+                            Object.keys(selectedTags[elementGroup].data).forEach( (elementTag) => {
+                                tempTags.push({
+                                    "code": elementTag,
+                                    "title": selectedTags[elementGroup].data[elementTag]
+                                })
+                            })
+
+                            tempTagGroups.push({
+                                "code": selectedTags[elementGroup].code,
+                                "title": selectedTags[elementGroup].title,
+                                "data": tempTags
+                            })
+                        })
+
+                        await fetch('/proxy/project_bible_template/projectBibleTemplateUpdateTagJsonCell', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "colCode": tagModalData[0].column,
+                                "rowCode": tagModalData[0].row,
+                                "value": tempTagGroups
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(
+                                async (resultUpdate) => {
+                                    setRows(
+                                        rows.map(info => {
+                                            info.data.map(row => {
+                                                if (row.code === tagModalData[0].row) {
+                                                    row.data[tagModalData[0].column] = tempTagGroups
+                                                }
+
+                                                return row
+                                            })
+
+                                            return info
+                                        })
+                                    )
+
+                                    setTagModalData(
+                                        tagModalData.map(info => {
+                                            info.selectedTags = []
+
+                                            return info
+                                        })
+                                    )
+
+                                    setTagModalActive(false)
+                                },
+                                (error) => {
+                                    alert("Ошибка при сохранении значения ячейки.")
+                                }
+                            )
+                    } else {
+                        let tempTagGroups = []
+
+                        Object.keys(selectedTags).forEach( (elementGroup) => {
+                            let tempTags = []
+
+                            Object.keys(selectedTags[elementGroup].data).forEach( (elementTag) => {
+                                tempTags.push({
+                                    "code": elementTag,
+                                    "title": selectedTags[elementGroup].data[elementTag]
+                                })
+                            })
+
+                            tempTagGroups.push({
+                                "code": selectedTags[elementGroup].code,
+                                "title": selectedTags[elementGroup].title,
+                                "data": tempTags
+                            })
+                        })
+
+                        await fetch('/proxy/project_bible_template/projectBibleTemplateInsertTagJsonCell', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "colCode": tagModalData[0].column,
+                                "rowCode": tagModalData[0].row,
+                                "value": tempTagGroups
+                            })
+                        })
+                            .then(res => res.json())
+                            .then(
+                                async (resultInsert) => {
+                                    setRows(
+                                        rows.map(info => {
+                                            info.data.map(row => {
+                                                if (row.code === tagModalData[0].row) {
+                                                    row.data[tagModalData[0].column] = tempTagGroups
+                                                }
+
+                                                return row
+                                            })
+
+                                            return info
+                                        })
+                                    )
+
+                                    setTagModalData(
+                                        tagModalData.map(info => {
+                                            info.selectedTags = []
+
+                                            return info
+                                        })
+                                    )
+
+                                    console.log("INSERT TAGS", tagModalData[0])
+
+                                    setTagModalActive(false)
+                                },
+                                (error) => {
+                                    alert("Ошибка при сохранении значения ячейки.")
+                                }
+                            )
+                    }
+                },
+                (error) => {
+                    alert("Ошибка при сохранении значения ячейки.")
+                }
+            )
+    }
+
     if (error) {
         return (
             <div className="row">
@@ -398,7 +662,7 @@ export default function ProjectBibleTemplateHeader(props) {
                 </div>
             </div>
         )
-    } else if (!isLoaded) {
+    } else if (!isLoaded || !isLoadedTagData) {
         return (
             <div className="row">
                 <div className="col-sm-12 center">
@@ -408,8 +672,8 @@ export default function ProjectBibleTemplateHeader(props) {
             </div>
         )
     } else {
-        console.log("columns[0].data", columns[0].data)
-        console.log("rows[0].data", rows[0].data)
+        // console.log("columns[0].data", columns[0].data)
+        // console.log("rows[0].data", rows[0].data)
 
         return(
             <div>
@@ -461,7 +725,7 @@ export default function ProjectBibleTemplateHeader(props) {
                         <div className="col-sm-12">
                             <TableInfo columns={columns[0].data} rows={rows[0].data}
                                        addRow={addRow} deleteRow={deleteRow} moveUpRow={moveUpRow}
-                                       moveDownRow={moveDownRow} />
+                                       moveDownRow={moveDownRow} setTagValue={setTagValue} />
                             <div className="center">
                                 <Button variant="primary" onClick={(e) =>
                                     addRowToTheEnd()}>Добавить&nbsp;&nbsp;<FontAwesomeIcon icon={faPlus} />
@@ -469,6 +733,8 @@ export default function ProjectBibleTemplateHeader(props) {
                             </div>
                         </div>
                     </div>
+                    <TagModal tagModalActive={tagModalActive} setTagModalActive={setTagModalActive}
+                              tagModalData={tagModalData} setTagModalData={setTagModalData} saveTagCell={saveTagCell} />
                 </div>
             </div>
         )

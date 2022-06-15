@@ -39,6 +39,17 @@ export default function TableCell(props) {
     )
 
     async function oninputCell(column, row, type, e, oldValue) {
+        let regex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/g;
+        let matchValue = e.target.innerHTML.match(regex) || []
+
+        if (type === "input" && e.target.innerText && matchValue.length) {
+            props.setInputRegexModalValue(true, column, row, e.target.innerHTML, oldValue)
+        } else {
+            saveCellValue(column, row, type, e, oldValue)
+        }
+    }
+
+    async function saveCellValue(column, row, type, e, oldValue) {
         let queryLinkExist = '/proxy/project_bible_template/'
         let queryUpdateCell = '/proxy/project_bible_template/'
         let queryInsertCell = '/proxy/project_bible_template/'
@@ -87,7 +98,7 @@ export default function TableCell(props) {
                 .then(res => res.json())
                 .then(
                     async (resultEditable) => {
-                        console.log("resultEditable", resultEditable)
+                        // console.log("resultEditable", resultEditable)
 
                         if (resultEditable.length) {
                             await fetch(queryUpdateCell, {
@@ -163,12 +174,12 @@ export default function TableCell(props) {
 
         document.addEventListener('keydown', function(event) {
             pressed.add(event.code)
-            console.log("pressed.add", pressed)
+            // console.log("pressed.add", pressed)
 
             if (pressed.has("ShiftLeft") && pressed.has("ArrowUp")) {
                 let newId = rowNum === 1 ? rowNum : rowNum - 1
 
-                console.log("ShiftLeft + ArrowUp", pressed, colCode + "_" + newId)
+                // console.log("ShiftLeft + ArrowUp", pressed, colCode + "_" + newId)
                 document.getElementById(colCode + "_" + newId).focus()
 
                 // return
@@ -176,7 +187,7 @@ export default function TableCell(props) {
                 let newId = rowNum + 1
 
                 if(document.getElementById(colCode + "_" + newId)) {
-                    console.log("ShiftLeft + ArrowDown", pressed, colCode + "_" + newId)
+                    // console.log("ShiftLeft + ArrowDown", pressed, colCode + "_" + newId)
                     document.getElementById(colCode + "_" + newId).focus()
                 }
 
@@ -189,9 +200,9 @@ export default function TableCell(props) {
         });
 
         document.addEventListener('keyup', function(event) {
-            console.log("keyup", pressed)
+            // console.log("keyup", pressed)
             pressed.delete(event.code)
-            console.log("keyup delete", pressed)
+            // console.log("keyup delete", pressed)
         });
     }
 
@@ -205,7 +216,8 @@ export default function TableCell(props) {
                         id={props.column.code + '_' + props.rowNum}
                         onBlur={(e) =>
                             oninputCell(props.column.code, props.rowCode, "input", e, props.value)}
-                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}>{props.value}</td>
+                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}
+                        dangerouslySetInnerHTML={{__html: props.value}}></td>
                 )
             } else if (cellInputColor === "red") {
                 return (
@@ -213,7 +225,8 @@ export default function TableCell(props) {
                         id={props.column.code + '_' + props.rowNum}
                         onBlur={(e) =>
                             oninputCell(props.column.code, props.rowCode, "input", e, props.value)}
-                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}>{props.value}</td>
+                        onKeyDown={(e) => pressKey(props.column.code, props.rowNum)}
+                        dangerouslySetInnerHTML={{__html: props.value}}></td>
                 )
             }
 
@@ -229,7 +242,7 @@ export default function TableCell(props) {
         }
     } else if (props.type === "checkbox") {
         if (props.editable) {
-            console.log(props.type, props.template, props.editable, props.value, props.row.template[props.column.code])
+            // console.log(props.type, props.template, props.editable, props.value, props.row.template[props.column.code])
 
             if (cellCheckboxColor === "white") {
                 return (
@@ -255,5 +268,33 @@ export default function TableCell(props) {
                 </td>
             )
         }
+    } else if (props.type === "tags_list") {
+        let textValueTags = []
+
+        if (props.value.length) {
+            props.value.map(group => {
+                group.data.map(tag => {
+                    textValueTags.push(tag.title)
+                })
+
+                return group
+            })
+        }
+
+        return(
+            <td contentEditable={false} style={styles.noEditableCell}
+                onDoubleClick={() => props.setTagValue(true, props.rowCode, props.column.code)} >
+                {
+                    textValueTags.map(tag => {
+                        return(
+                            <div key={tag}>
+                                {tag}
+                            </div>
+                        )
+                    })
+                }
+            </td>
+        )
+
     }
 }

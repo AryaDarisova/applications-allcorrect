@@ -106,17 +106,45 @@ export default function TableCell(props) {
     }
 
     if (props.type === "input") {
-        return (
+        return(
             <td contentEditable={true} suppressContentEditableWarning={true} style={styles.cell}
                 onBlur={(e) =>
                     oninputCell(props.column.code, props.rowCode, "input", e)}>{parse(props.value)}</td>
         )
     } else if (props.type === "checkbox") {
-        return (
+        return(
             <td contentEditable={false} className="center align-middle">
                 <FormCheck defaultChecked={props.value}
                            onInput={(e) =>
                                oninputCell(props.column.code, props.rowCode, "checkbox", e)}/>
+            </td>
+        )
+    } else if (props.type === "tags_list") {
+        //todo тут надо будет разобраться с тем, как значение будет заполняться
+        let textValueTags = []
+
+        if (props.value.length) {
+            props.value.map(group => {
+                group.data.map(tag => {
+                    // textValueTags += "<div>" + tag.title + "</div>"
+                    textValueTags.push(tag.title)
+                })
+
+                return group
+            })
+        }
+
+        return(
+            <td contentEditable={false} onDoubleClick={() => props.setTagValue(true, props.rowCode, props.column.code)} >
+                {
+                    textValueTags.map(tag => {
+                        return(
+                            <div key={tag}>
+                                {tag}
+                            </div>
+                        )
+                    })
+                }
             </td>
         )
     }

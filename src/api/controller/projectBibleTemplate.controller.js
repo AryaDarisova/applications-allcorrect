@@ -449,6 +449,47 @@ class ProjectBibleTemplateController {
         res.json(queryResult)
     }
 
+    //Запросы к таблице project_bible_template_json
+    async getProjectBibleTagJsonTemplateValue(req, res) {
+        const {rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_template_json WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode]
+        )
+
+        res.json(value.rows[0].value)
+    }
+
+    async getProjectBibleTagJsonTemplateIfExistValue(req, res) {
+        const {rowCode, colCode} = req.body
+        const value = await db.query(
+            'SELECT value FROM project_bible_template_json WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode]
+        )
+
+        res.json(value.rows)
+    }
+
+    async setProjectBibleTemplateUpdateTagJsonCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'UPDATE project_bible_template_json SET value = $3 WHERE row_code = $1 AND col_code = $2',
+            [rowCode, colCode, JSON.stringify(value)]
+        )
+
+        res.json(queryResult)
+    }
+
+    async setProjectBibleTemplateInsertTagJsonCell(req, res) {
+        const {colCode, rowCode, value} = req.body
+        const queryResult = await db.query(
+            'INSERT INTO project_bible_template_json (row_code, col_code, value) VALUES ($1, $2, $3)',
+            [rowCode, colCode, JSON.stringify(value)]
+        )
+
+        res.json(queryResult)
+    }
+
     //Запросы к таблице project_bible_info
     async getProjectBibleInfo(req, res) {
         const {clientName, projectName, projectCode} = req.body

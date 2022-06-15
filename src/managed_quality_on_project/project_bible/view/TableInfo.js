@@ -92,7 +92,8 @@ export default function TableInfo(props) {
                         return (
                             <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns}
                                       moveUpRow={props.moveUpRow} moveDownRow={props.moveDownRow}
-                                      actionColumn={props.actionColumn} rowNum={rowNum} />
+                                      actionColumn={props.actionColumn} rowNum={rowNum}
+                                      setInputRegexModalValue={props.setInputRegexModalValue} />
                         )
                     }
                 })

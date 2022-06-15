@@ -24,7 +24,7 @@ export default function TableInfo(props) {
                     return(
                         <TableRow key={rowIndex} row={row} rowIndex={rowIndex} columns={props.columns}
                                   addRow={props.addRow} deleteRow={props.deleteRow} moveUpRow={props.moveUpRow}
-                                  moveDownRow={props.moveDownRow}/>
+                                  moveDownRow={props.moveDownRow} setTagValue={props.setTagValue} />
                     )
                 })
             }
