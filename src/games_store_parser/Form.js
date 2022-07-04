@@ -48,10 +48,9 @@ export default function Form(props) {
                                 </div>
                             </div>
                             <br />
-                            <AdditionalFilter checked={props.gameStores} steamRemoveEnglish={props.steamRemoveEnglish}
-                                              steamAllTime={props.steamAllTime}
-                                              setSteamDateRange={props.setSteamDateRange}
-                                              /*googlePlayFoundByFilter={props.googlePlayFoundByFilter}*/ />
+                            <AdditionalFilter checked={props.gameStores} setSearchLocReviews={props.setSearchLocReviews}
+                                              setSelectedLanguagesMultiselect={props.setSelectedLanguagesMultiselect}
+                                              setAllTime={props.setAllTime} setDateRange={props.setDateRange} />
                             <br />
                             <div className="row">
                                 <div className="col-sm-12" style={styles.blockCenter}>

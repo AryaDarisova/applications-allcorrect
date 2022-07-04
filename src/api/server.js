@@ -55,6 +55,25 @@ app.post('/proxy/mobile_store_proxy/app_store', (req, res) => {
         );
 });
 
+app.post('/proxy/mobile_store_proxy/app_store_every_reviews', (req, res) => {
+    appStoreReviews.reviews({
+        id: req.body.appId,
+        country: req.body.countryCodes,
+        sort: appStoreReviews.sort.RECENT,
+        page: req.body.page
+    })
+        .then(
+            result => {
+                res.json(result);
+            }
+        )
+        .catch(
+            error => {
+                res.json({'error': error})
+            }
+        );
+});
+
 app.listen(PORT, () => {
     console.log(`Server listening on the port::${PORT} (´• ω •) ʕ•ᴥ•ʔ`);
 });
