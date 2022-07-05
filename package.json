@@ -41,6 +41,7 @@
     "react-date-range": "^1.4.0",
     "react-dom": "^17.0.1",
     "react-input-date": "^1.0.12",
+    "react-native": "^0.69.1",
     "react-router-dom": "^6.0.1",
     "react-scripts": "4.0.3",
     "react-table": "^7.7.0",
@@ -53,7 +54,7 @@
   },
   "scripts": {
     "start": "react-scripts start --max_old_space_size=2048",
-    "build": "react-scripts build",
+    "build": "npm install --legacy-peer-deps & react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "nodemon ./src/api/server.js"
