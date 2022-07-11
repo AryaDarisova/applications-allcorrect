@@ -28,6 +28,7 @@
     "jquery": "^3.6.0",
     "languagetool-api": "^1.1.2",
     "nodemon": "^2.0.4",
+    "nvm": "^0.0.4",
     "pdfmake": "^0.2.4",
     "pg": "^8.7.1",
     "primeicons": "^5.0.0",
