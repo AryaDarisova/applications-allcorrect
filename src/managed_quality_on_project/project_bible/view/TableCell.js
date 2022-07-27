@@ -295,6 +295,5 @@ export default function TableCell(props) {
                 }
             </td>
         )
-
     }
 }

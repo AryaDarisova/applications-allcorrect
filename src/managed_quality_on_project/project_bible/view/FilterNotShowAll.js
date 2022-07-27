@@ -44,6 +44,8 @@ export default function FilterNotShowAll(props) {
                            label='Стоит галочка'/>
             </div>
         )
+    } else if (props.column.type === "tags_list") {
+
     }
 }
 

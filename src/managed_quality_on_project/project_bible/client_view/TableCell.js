@@ -213,5 +213,47 @@ export default function TableCell(props) {
                 </td>
             )*/
         }
+    } else if (props.column.type === "tags_list") {
+        let textValueTags = []
+
+        if (props.value.length) {
+            props.value.map(group => {
+                group.data.map(tag => {
+                    textValueTags.push(tag.title)
+                })
+
+                return group
+            })
+        }
+
+        if (props.filledRowColor) {
+            return(
+                <td contentEditable={false} style={styles.filledRow}>
+                    {
+                        textValueTags.map(tag => {
+                            return(
+                                <div key={tag}>
+                                    {tag}
+                                </div>
+                            )
+                        })
+                    }
+                </td>
+            )
+        } else {
+            return(
+                <td contentEditable={false} style={styles.noEditableCell}>
+                    {
+                        textValueTags.map(tag => {
+                            return(
+                                <div key={tag}>
+                                    {tag}
+                                </div>
+                            )
+                        })
+                    }
+                </td>
+            )
+        }
     }
 }

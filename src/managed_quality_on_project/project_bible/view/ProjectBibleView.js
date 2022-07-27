@@ -518,6 +518,8 @@ export default function ProjectBibleView(props) {
                                             } else if (column.type === "checkbox") {
                                                 // row.data.push(false)
                                                 row.data[column.code] = false
+                                            } else if (column.type === "tags_list") {
+                                                row.data[column.code] = []
                                             }
                                         }
 

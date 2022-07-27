@@ -211,9 +211,12 @@ export default function ProjectBibleClientView(props) {
                             } else if (column.type === "checkbox") {
                                 queryLinkTemplate += 'projectBibleTemplateBoolByNameIfExist'
                                 queryLinkEditable += 'projectBibleFilledCellBoolByName'
+                            } else if (column.type === "tags_list") {
+                                queryLinkTemplate += 'projectBibleTemplateTagJsonByNameIfExist'
+                                queryLinkEditable += 'projectBibleFilledCellBoolByName'
                             }
 
-                            if (column.template & column.editable) {
+                            if (column.template && column.editable) {
                                 await fetch(queryLinkTemplate, {
                                     method: 'POST',
                                     headers: {
@@ -294,6 +297,8 @@ export default function ProjectBibleClientView(props) {
                                                 row.data[column.code] = ""
                                             } else if (column.type === "checkbox") {
                                                 row.data[column.code] = false
+                                            } else if (column.type === "tags_list") {
+                                                row.data[column.code] = []
                                             }
 
                                             cellOnCount++
@@ -333,6 +338,8 @@ export default function ProjectBibleClientView(props) {
                                                     row.data[column.code] = ""
                                                 } else if (column.type === "checkbox") {
                                                     row.data[column.code] = false
+                                                } else if (column.type === "tags_list") {
+                                                    row.data[column.code] = []
                                                 }
                                             }
 
